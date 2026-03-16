@@ -1,7 +1,7 @@
 # User story title: Manage opening hours and holidays
 
-## Priority: 30
-Iteration 2/3 candidate (Restaurant availability).
+## Priority: 10
+Core feature (Restaurant availability).
 
 ## Estimation:
 TBD (planning poker).
