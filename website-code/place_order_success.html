@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FeedMe | Order Placed</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* kept minimal; main styles loaded from style.css */
+    </style>
+ </head>
+<body>
+    <main class="page-shell">
+        <section class="hero">
+            <p class="eyebrow">Order Confirmation</p>
+            <h1>Thank you — your order is on its way</h1>
+            <p class="hero-copy">We've sent your order to the restaurant. Keep this reference in case you need help.</p>
+        </section>
+
+        <section class="list-panel">
+            <div class="success-card">
+                <p id="confirmMessage">Order placed successfully.</p>
+                <p>Order reference</p>
+                <p id="orderRef" class="big-ref">—</p>
+                <p id="restaurantMessage">The restaurant has received your order and will prepare it shortly.</p>
+                <div style="margin-top:18px; display:flex; gap:12px;">
+                    <a href="index.html" class="refresh-button">Back to restaurants</a>
+                    <a id="viewOrderBtn" href="#" style="align-self:center; color:#24422f; text-decoration:none;">View order details</a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const refEl = document.getElementById('orderRef');
+            const viewBtn = document.getElementById('viewOrderBtn');
+            const rawRef = localStorage.getItem('lastOrderRef');
+            const rawOrder = localStorage.getItem('lastOrder');
+
+            if (rawRef) {
+                refEl.textContent = rawRef;
+            } else {
+                refEl.textContent = 'Unknown';
+            }
+
+            if (rawOrder) {
+                try {
+                    const order = JSON.parse(rawOrder);
+                    viewBtn.href = '#';
+                    viewBtn.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        alert(JSON.stringify(order, null, 2));
+                    });
+                } catch (e) {
+                    viewBtn.style.display = 'none';
+                }
+            } else {
+                viewBtn.style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>

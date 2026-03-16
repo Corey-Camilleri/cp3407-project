@@ -36,6 +36,7 @@ This repo uses an OpenClaw assistant as a **project manager** to:
 ## Quick links
 - Project site index: `docs/index.md`
 - Assessment mapping: `docs/assessment-mapping.md`
+- Team deployment flow: `docs/deployment-github-aws.md`
 - User stories folder: `user_stories/`
 - Iterations:
   - `iteration_1.md`

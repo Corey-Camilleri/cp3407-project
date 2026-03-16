@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>FeedMe | Place Order</title>
+	<link rel="stylesheet" href="style.css">
+ </head>
+<body>
+	<main class="page-shell">
+		<section class="hero">
+			<p class="eyebrow">Checkout</p>
+			<h1>Confirm and place your order</h1>
+			<p class="hero-copy">Review your items and delivery details, then confirm to send the order to the restaurant.</p>
+		</section>
+
+		<section class="list-panel">
+			<div class="panel-header">
+				<div>
+					<p class="section-label">Checkout</p>
+					<h2>Order review</h2>
+				</div>
+			</div>
+
+			<div id="checkoutArea">
+				<div id="orderItems" class="restaurant-grid"></div>
+
+				<div style="margin-top:18px; flex-wrap:wrap;">
+					<div class="form-row">
+						<div class="form-column" style="min-width:260px;">
+							<h3>Delivery details</h3>
+							<div id="deliveryDetails">
+								<label>
+									Name
+									<input id="customerName" type="text" placeholder="Full name">
+								</label>
+								<label>
+									Address
+									<input id="customerAddress" type="text" placeholder="Street, suburb">
+								</label>
+								<label>
+									Contact phone
+									<input id="customerPhone" type="tel" placeholder="Mobile number">
+								</label>
+							</div>
+						</div>
+
+						<div style="width:320px;">
+						<h3>Order summary</h3>
+						<div class="restaurant-card">
+							<div class="meta-list">
+								<div><dt>Subtotal</dt><dd id="subtotal">$0.00</dd></div>
+								<div><dt>Delivery fee</dt><dd id="deliveryFee">$0.00</dd></div>
+								<div><dt>Total</dt><dd id="total">$0.00</dd></div>
+							</div>
+							<div style="margin-top:16px; display:flex; gap:8px;">
+								<button id="placeOrderBtn" class="refresh-button" type="button">Place order</button>
+								<a href="index.html" style="align-self:center; color:#24422f; text-decoration:none;">Back to restaurants</a>
+							</div>
+							<div id="checkoutMessage" class="status-message"></div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+	</main>
+
+	<script src="features/place-order.js"></script>
+</body>
+</html>
