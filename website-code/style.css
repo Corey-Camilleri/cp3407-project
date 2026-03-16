@@ -322,6 +322,39 @@ body {
 	color: #566657;
 }
 
+label {
+	display: block;
+	margin-bottom: 12px;
+	font-size: 0.95rem;
+	color: #3e4a40;
+}
+
+input[type="text"], input[type="tel"], input[type="email"], textarea {
+	width: 100%;
+	padding: 10px 12px;
+	border-radius: 10px;
+	border: 1px solid rgba(75,95,78,0.12);
+	background: #fff;
+	font: inherit;
+	margin-top:6px;
+}
+
+h3 {
+	margin: 0 0 12px 0;
+	font-size: 1.05rem;
+	color: #24422f;
+}
+
+.form-row {
+	display: flex;
+	gap: 12px;
+}
+
+.form-column { flex: 1; }
+
+.success-card { padding:24px; border-radius:18px; background:#fffefb; border:1px solid rgba(75,95,78,0.12); }
+.big-ref { font-family:monospace; font-weight:700; color:#24422f; font-size:1.2rem; }
+
 .closing-banner {
 	margin-top: 24px;
 	padding: 28px;
