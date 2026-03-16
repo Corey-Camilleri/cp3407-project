@@ -2,9 +2,34 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Hello Corey!!!</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FeedMe | Browse Restaurants</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <h1>Hello Corey</h1>
+    <main class="page-shell">
+        <section class="hero">
+            <p class="eyebrow">User Story 02</p>
+            <h1>Browse local restaurants</h1>
+            <p class="hero-copy">
+                Iteration 1 keeps this feature simple: show active restaurants in a clean list so customers can quickly choose where to order from.
+            </p>
+        </section>
+
+        <section class="list-panel">
+            <div class="panel-header">
+                <div>
+                    <p class="section-label">Available now</p>
+                    <h2>Restaurants near you</h2>
+                </div>
+                <button id="refreshButton" class="refresh-button" type="button">Refresh list</button>
+            </div>
+
+            <div id="statusMessage" class="status-message">Loading restaurants...</div>
+            <div id="restaurantList" class="restaurant-grid"></div>
+        </section>
+    </main>
+
+    <script src="browse-restaurants.js"></script>
 </body>
 </html>

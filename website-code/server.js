@@ -42,8 +42,23 @@ sequelize.authenticate()
 // Example route - get all restaurants
 app.get('/api/restaurants', async (req, res) => {
   try {
-    const restaurants = await models.Restaurant.findAll();
-    res.json(restaurants);
+    const restaurants = await models.Restaurant.findAll({
+      where: {
+        Status: 'ACTIVE'
+      },
+      order: [['Name', 'ASC']]
+    });
+
+    res.json(
+      restaurants.map((restaurant) => ({
+        id: restaurant.Restaurant_ID,
+        name: restaurant.Name,
+        description: restaurant.Description,
+        phone: restaurant.Phone,
+        serviceRadiusKm: restaurant.Service_Radius_KM,
+        status: restaurant.Status
+      }))
+    );
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
