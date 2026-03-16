@@ -25,13 +25,15 @@ This index groups user stories by persona for quick navigation.
 - `restaurant/user_story_12_add_restaurant_profile.md` — Add restaurant profile
 - `restaurant/user_story_13_view_sales_trends.md` — View sales trends
 - `restaurant/user_story_15_bundle_multi_meal_ordering.md` — Bundle and multi-meal ordering to reduce cost
-- `restaurant/user_story_16_update_menu_easily.md` — Update menu easily
+- `restaurant/user_story_16_update_menu_easily.md` — Add menu items
 - `restaurant/user_story_20_add_tags_menu_and_profile.md` — Add tags to menu options and restaurant profile
 - `restaurant/user_story_23_access_vendor_support.md` — Access vendor support
 - `restaurant/user_story_24_add_discounts.md` — Add discounts
 - `restaurant/user_story_25_sponsored_category_placement.md` — Sponsored placement in top category
 - `restaurant/user_story_29_pause_orders_temporarily.md` — Pause orders temporarily
 - `restaurant/user_story_30_manage_opening_hours.md` — Manage opening hours and holidays
+- `restaurant/user_story_31_add_categories_to_menu_items.md` — Add categories to menu items
+
 
 ## Driver / Courier
 - (TBD — to be created)

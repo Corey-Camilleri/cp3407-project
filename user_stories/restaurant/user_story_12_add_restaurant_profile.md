@@ -1,7 +1,7 @@
 # User story title: Add restaurant profile
 
-## Priority: 20
-Iteration 2 candidate (Restaurant onboarding).
+## Priority: 10
+Core feature (Restaurant onboarding).
 
 ## Estimation:
 TBD (planning poker).
