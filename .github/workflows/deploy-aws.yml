@@ -1,0 +1,154 @@
+name: Deploy to AWS
+
+on:
+  push:
+    branches:
+      - staging
+      - main
+  pull_request:
+    branches:
+      - staging
+      - main
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+          cache-dependency-path: website-code/package-lock.json
+
+      - name: Install dependencies
+        working-directory: website-code
+        run: npm ci
+
+      - name: Run tests
+        working-directory: website-code
+        run: npm test
+
+      - name: Create deployment bundle
+        run: tar -czf website-code.tar.gz website-code
+
+      - name: Upload bundle artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: website-code-bundle
+          path: website-code.tar.gz
+
+  deploy-staging:
+    if: github.event_name == 'push' && github.ref_name == 'staging'
+    needs: build
+    runs-on: ubuntu-latest
+    environment: staging
+
+    steps:
+      - name: Download bundle artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: website-code-bundle
+
+      - name: Copy bundle to staging server
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.STAGING_HOST }}
+          username: ${{ secrets.STAGING_USER }}
+          key: ${{ secrets.STAGING_SSH_KEY }}
+          port: ${{ secrets.STAGING_PORT || 22 }}
+          source: website-code.tar.gz
+          target: /tmp
+
+      - name: Deploy on staging server
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.STAGING_HOST }}
+          username: ${{ secrets.STAGING_USER }}
+          key: ${{ secrets.STAGING_SSH_KEY }}
+          port: ${{ secrets.STAGING_PORT || 22 }}
+          script: |
+            set -e
+            APP_DIR=/var/www/cp3407-staging
+            APP_NAME=cp3407-staging
+
+            sudo mkdir -p "$APP_DIR"
+            sudo tar -xzf /tmp/website-code.tar.gz -C "$APP_DIR" --strip-components=1
+            sudo chown -R $USER:$USER "$APP_DIR"
+
+            cd "$APP_DIR"
+            npm ci --omit=dev
+
+            if ! command -v pm2 >/dev/null 2>&1; then
+              sudo npm install -g pm2
+            fi
+
+            if pm2 describe "$APP_NAME" >/dev/null 2>&1; then
+              pm2 restart "$APP_NAME" --update-env
+            else
+              pm2 start server.js --name "$APP_NAME"
+            fi
+
+            pm2 save
+
+  deploy-production:
+    if: github.event_name == 'push' && github.ref_name == 'main'
+    needs: build
+    runs-on: ubuntu-latest
+    environment: production
+
+    steps:
+      - name: Download bundle artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: website-code-bundle
+
+      - name: Copy bundle to production server
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.PROD_HOST }}
+          username: ${{ secrets.PROD_USER }}
+          key: ${{ secrets.PROD_SSH_KEY }}
+          port: ${{ secrets.PROD_PORT || 22 }}
+          source: website-code.tar.gz
+          target: /tmp
+
+      - name: Deploy on production server
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.PROD_HOST }}
+          username: ${{ secrets.PROD_USER }}
+          key: ${{ secrets.PROD_SSH_KEY }}
+          port: ${{ secrets.PROD_PORT || 22 }}
+          script: |
+            set -e
+            APP_DIR=/var/www/cp3407-production
+            APP_NAME=cp3407-production
+
+            sudo mkdir -p "$APP_DIR"
+            sudo tar -xzf /tmp/website-code.tar.gz -C "$APP_DIR" --strip-components=1
+            sudo chown -R $USER:$USER "$APP_DIR"
+
+            cd "$APP_DIR"
+            npm ci --omit=dev
+
+            if ! command -v pm2 >/dev/null 2>&1; then
+              sudo npm install -g pm2
+            fi
+
+            if pm2 describe "$APP_NAME" >/dev/null 2>&1; then
+              pm2 restart "$APP_NAME" --update-env
+            else
+              pm2 start server.js --name "$APP_NAME"
+            fi
+
+            pm2 save
