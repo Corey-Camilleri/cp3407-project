@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>FeedMe | View Receipts</title>
+	<link rel="stylesheet" href="style.css">
+</head>
+<body>
+	<main class="page-shell">
+		<section class="hero">
+			<p class="eyebrow">User Story 07</p>
+			<h1>Receipts</h1>
+			<p class="hero-copy">Check all your past orders and see details for each receipt.</p>
+		</section>
+
+		<section class="list-panel">
+			<div class="panel-header">
+				<div>
+					<p class="section-label">Receipts</p>
+					<h2>Order history</h2>
+				</div>
+			</div>
+
+			<div id="receiptArea">
+				<!-- List of receipts -->
+				<div id="receiptList" class="restaurant-grid"></div>
+
+				<!-- Selected receipt details -->
+				<div style="margin-top:18px; display:flex; gap:18px; flex-wrap:wrap;">
+					<div style="flex:1; min-width:260px;">
+						<h3>Receipt details</h3>
+						<div id="receiptDetails">
+							<pre id="receiptContent">Select a receipt to view details</pre>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+	</main>
+
+	<script src="features/view-receipt.js"></script>
+</body>
+</html>
