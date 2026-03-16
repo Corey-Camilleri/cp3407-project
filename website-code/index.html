@@ -3,30 +3,94 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FeedMe | Browse Restaurants</title>
+    <title>FeedMe | Home</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <main class="page-shell">
-        <section class="hero">
-            <p class="eyebrow">User Story 06</p>
-            <h1>Browse local restaurants</h1>
-            <p class="hero-copy">
-                Iteration 1 keeps this feature simple: show active restaurants in a clean list so customers can quickly choose where to order from.
-            </p>
+        <header class="topbar">
+            <div>
+                <p class="brand-mark">FeedMe</p>
+                <p class="brand-subtitle">Delivery platform for hungry locals and busy restaurants.</p>
+            </div>
+            <nav class="topnav" aria-label="Primary navigation">
+                <a href="#how-it-works">How it works</a>
+                <a href="#restaurants">Restaurants</a>
+                <a href="#why-feedme">Why FeedMe</a>
+            </nav>
+        </header>
+
+        <section class="hero hero-grid">
+            <div class="hero-copy-block">
+                <p class="eyebrow">Local delivery made simple</p>
+                <h1>Order from nearby restaurants without leaving home.</h1>
+                <p class="hero-copy">
+                    FeedMe helps customers discover local restaurants, place orders faster, and track what happens next. This homepage introduces the platform while still showing live restaurant data from the staging database.
+                </p>
+                <div class="hero-actions">
+                    <a class="primary-link" href="#restaurants">Browse restaurants</a>
+                    <a class="secondary-link" href="#how-it-works">See how it works</a>
+                </div>
+            </div>
+
+            <aside class="hero-card">
+                <p class="section-label">What you can do</p>
+                <ul class="hero-checklist">
+                    <li>Find active restaurants near you</li>
+                    <li>Compare delivery reach and contact details</li>
+                    <li>Build toward ordering, tracking, and receipts</li>
+                </ul>
+                <div class="hero-stats">
+                    <div>
+                        <strong>25</strong>
+                        <span>database tables ready</span>
+                    </div>
+                    <div>
+                        <strong>5</strong>
+                        <span>sample rows per table</span>
+                    </div>
+                </div>
+            </aside>
         </section>
 
-        <section class="list-panel">
+        <section id="how-it-works" class="feature-strip">
+            <article class="feature-card">
+                <p class="section-label">Step 1</p>
+                <h2>Discover places to eat</h2>
+                <p>Customers start on the homepage, scan featured restaurants, and choose where to order from.</p>
+            </article>
+            <article class="feature-card">
+                <p class="section-label">Step 2</p>
+                <h2>Order with less friction</h2>
+                <p>The platform is designed to support menus, carts, checkout, and delivery updates in later stories.</p>
+            </article>
+            <article id="why-feedme" class="feature-card accent-card">
+                <p class="section-label">Why FeedMe</p>
+                <h2>One system for customers, merchants, and drivers</h2>
+                <p>FeedMe keeps the core delivery flow in one place so the team can grow features story by story.</p>
+            </article>
+        </section>
+
+        <section id="restaurants" class="list-panel">
             <div class="panel-header">
                 <div>
-                    <p class="section-label">Available now</p>
-                    <h2>Restaurants near you</h2>
+                    <p class="section-label">Live preview</p>
+                    <h2>Restaurants on FeedMe</h2>
+                    <p class="panel-copy">This section loads active restaurants from the current backend so the homepage still reflects real app data.</p>
                 </div>
                 <button id="refreshButton" class="refresh-button" type="button">Refresh list</button>
             </div>
 
             <div id="statusMessage" class="status-message">Loading restaurants...</div>
             <div id="restaurantList" class="restaurant-grid"></div>
+        </section>
+
+        <section class="closing-banner">
+            <p class="section-label">Iteration 1 focus</p>
+            <h2>Start with browsing, then expand the customer journey.</h2>
+            <p>
+                This homepage gives the project a clearer public-facing entry point while preserving the restaurant browsing feature already implemented for the current user story.
+            </p>
         </section>
     </main>
 
