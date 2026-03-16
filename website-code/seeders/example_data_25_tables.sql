@@ -1,5 +1,5 @@
 -- Auto-generated sample data: 5 rows per table
-USE `cp3407`;
+USE `cp3407_staging`;
 SET FOREIGN_KEY_CHECKS = 0;
 
 -- Address
