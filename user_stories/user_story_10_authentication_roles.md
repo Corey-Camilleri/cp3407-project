@@ -1,6 +1,6 @@
 # User story title: Authentication and role-based access
 
-## Priority: 40
+## Priority: 10
 High-level (iteration-agnostic).
 
 ## Estimation:
