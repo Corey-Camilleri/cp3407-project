@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FeedMe | Order status</title>
+    <link rel="stylesheet" href="style.css">
+ </head>
+<body>
+    <main class="page-shell">
+        <section class="hero">
+            <p class="eyebrow">Order tracking</p>
+            <h1>Track your order</h1>
+            <p class="hero-copy">Enter your order reference or use your most recent order to see live status updates.</p>
+        </section>
+
+        <section class="list-panel">
+            <div class="panel-header">
+                <div>
+                    <p class="section-label">Order tracking</p>
+                    <h2>Order status</h2>
+                </div>
+                <div style="display:flex; gap:12px; align-items:center;">
+                    <input id="searchRef" type="text" placeholder="Enter order reference" style="padding:8px 12px; border-radius:10px; border:1px solid rgba(75,95,78,0.12)">
+                    <button id="lookupBtn" class="refresh-button">Lookup</button>
+                </div>
+            </div>
+
+            <div id="statusArea">
+                <div id="statusMessage" class="status-message">No order selected.</div>
+
+                <div id="orderCard" class="restaurant-card" style="display:none; margin-top:12px;">
+                    <div class="card-topline">
+                        <div>
+                            <h3 id="orderRestaurant">Order</h3>
+                            <div class="restaurant-id" id="orderRef">REF</div>
+                        </div>
+                        <div id="orderTotal" style="text-align:right;">$0.00</div>
+                    </div>
+
+                    <div id="orderItemsList" class="meta-list"></div>
+
+                    <h3 style="margin-top:16px;">Status timeline</h3>
+                    <div id="timeline" class="status-timeline"></div>
+
+                    <div style="margin-top:16px; display:flex; gap:8px;">
+                        <button id="advanceBtn" class="refresh-button">Advance status</button>
+                        <button id="simulateBtn" class="refresh-button">Simulate auto-updates</button>
+                        <a href="index.html" style="align-self:center; color:#24422f; text-decoration:none;">Back</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script src="features/order-status.js"></script>
+</body>
+</html>
