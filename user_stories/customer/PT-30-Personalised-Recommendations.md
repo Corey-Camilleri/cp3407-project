@@ -22,4 +22,4 @@ Description-v1: As a **customer**, I want personalised meal and restaurant recom
 - Recommended for you section with quick-add actions.
 
 # Completed:
-- 
+-

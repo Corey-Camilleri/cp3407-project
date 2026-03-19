@@ -22,4 +22,4 @@ Description-v1: As a **restaurant**, I want to access vendor support, so I can r
 - Vendor support center with ticket list and new ticket form.
 
 # Completed:
-- 
+-

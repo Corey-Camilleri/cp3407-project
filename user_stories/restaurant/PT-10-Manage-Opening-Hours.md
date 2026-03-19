@@ -22,4 +22,4 @@ Description-v1: As a **restaurant**, I want to manage opening hours and holiday 
 - Hours editor with day-by-day time ranges and holiday date picker.
 
 # Completed:
-- 
+-

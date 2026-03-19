@@ -20,4 +20,4 @@ Description-v1: As a **customer**, I want to add/remove items and adjust quantit
 - Link/attach Figma frame once confirmed.
 
 # Completed:
-- 
+-

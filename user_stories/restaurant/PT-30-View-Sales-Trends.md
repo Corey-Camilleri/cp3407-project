@@ -22,4 +22,4 @@ Description-v1: As a **restaurant**, I want to view sales trends, so I can make 
 - Sales dashboard card with date filters and trend summary.
 
 # Completed:
-- 
+-

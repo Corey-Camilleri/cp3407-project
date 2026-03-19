@@ -22,4 +22,4 @@ Description-v1: As a **restaurant**, I want to add discounts, so I can attract m
 - Discount management panel with active/scheduled promotions.
 
 # Completed:
-- 
+-

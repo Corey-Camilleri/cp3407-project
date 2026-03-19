@@ -22,4 +22,4 @@ Description-v1: As a **restaurant**, I want to add tags to menu options and my p
 - Tag picker component in profile and menu forms.
 
 # Completed:
-- 
+-

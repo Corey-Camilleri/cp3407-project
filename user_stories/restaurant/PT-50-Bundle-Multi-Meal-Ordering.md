@@ -22,4 +22,4 @@ Description-v1: As a **restaurant**, I want to offer bundle and multi-meal order
 - Bundle builder and bundle cards on menu page.
 
 # Completed:
-- 
+-

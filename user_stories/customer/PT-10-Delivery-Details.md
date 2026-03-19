@@ -20,4 +20,4 @@ Description-v1: As a **customer**, I want to enter/select delivery details (addr
 - Link/attach Figma frame once confirmed.
 
 # Completed:
-- 
+-

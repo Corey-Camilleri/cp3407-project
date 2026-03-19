@@ -22,4 +22,4 @@ Description-v1: As a **customer**, I want to apply a promo code at checkout, so 
 - Promo code field near order total summary.
 
 # Completed:
-- 
+-

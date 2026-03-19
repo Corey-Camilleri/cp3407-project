@@ -22,4 +22,4 @@ Description-v1: As a **customer**, I want to re-order a previous order quickly, 
 - Re-order button on completed orders.
 
 # Completed:
-- 
+-

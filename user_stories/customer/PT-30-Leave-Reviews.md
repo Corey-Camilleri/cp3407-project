@@ -22,4 +22,4 @@ Description-v1: As a **customer**, I want to review a restaurant, so I can share
 - Rating stars and comment field in order history.
 
 # Completed:
-- 
+-

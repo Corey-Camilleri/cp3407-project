@@ -22,4 +22,4 @@ Description-v1: As a **restaurant**, I want to create my restaurant profile, so 
 - Profile setup page with sections for details, branding, and contact.
 
 # Completed:
-- 
+-

@@ -22,4 +22,4 @@ Description-v1: As a **restaurant**, I want to add categories to menu items, so 
 - Category manager and category selector in add/edit item form.
 
 # Completed:
-- 
+-
