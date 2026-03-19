@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FeedMe | Add Menu Item</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* Minimal inline styles; main styles from style.css */
+        .form-card {
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 12px;
+            max-width: 400px;
+            margin: 0 auto;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        input, button {
+            width: 100%;
+            margin-top: 8px;
+            padding: 8px 12px;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+        }
+        button {
+            background-color: #24422f;
+            color: white;
+            cursor: pointer;
+            margin-top: 12px;
+        }
+        ul#menuList {
+            margin-top: 20px;
+            padding-left: 20px;
+        }
+    </style>
+</head>
+<body>
+    <main class="page-shell">
+        <section class="hero">
+            <p class="eyebrow">Add Menu Item</p>
+            <h1>Create a new menu entry</h1>
+            <p class="hero-copy">Add items that will be visible in the restaurant menu for customers.</p>
+        </section>
+
+        <section class="list-panel">
+            <div class="form-card">
+                <form id="menuForm">
+                    <label for="itemName">Item Name:</label>
+                    <input type="text" id="itemName" placeholder="Enter menu item name" required>
+
+                    <label for="itemPrice">Price ($):</label>
+                    <input type="number" id="itemPrice" placeholder="Enter price" step="0.01" required>
+
+                    <button type="submit">Add Item</button>
+                </form>
+
+                <h2>Current Menu</h2>
+                <ul id="menuList"></ul>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Get menu from localStorage or start empty
+            const menuItems = JSON.parse(localStorage.getItem('menuItems')) || [];
+
+            const menuList = document.getElementById('menuList');
+            const form = document.getElementById('menuForm');
+
+            // Function to render menu list
+            function renderMenu() {
+                menuList.innerHTML = '';
+                menuItems.forEach(item => {
+                    const li = document.createElement('li');
+                    li.textContent = `${item.name} - $${item.price.toFixed(2)}`;
+                    menuList.appendChild(li);
+                });
+            }
+
+            // Initial render
+            renderMenu();
+
+            // Handle form submit
+            form.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const name = document.getElementById('itemName').value;
+                const price = parseFloat(document.getElementById('itemPrice').value);
+
+                if (!name || !price) {
+                    alert('Please fill in all fields');
+                    return;
+                }
+
+                // Add new item to array
+                menuItems.push({ name, price });
+                localStorage.setItem('menuItems', JSON.stringify(menuItems));
+
+                // Re-render menu
+                renderMenu();
+
+                // Clear form
+                form.reset();
+            });
+        });
+    </script>
+</body>
+</html>
