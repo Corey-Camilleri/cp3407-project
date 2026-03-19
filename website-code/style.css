@@ -360,6 +360,116 @@ h3 {
 	padding: 28px;
 }
 
+.restaurant-hero {
+	padding-top: 8px;
+}
+
+.field-label {
+	margin-top: 20px;
+	margin-bottom: 8px;
+	font-weight: 700;
+	color: var(--ink);
+}
+
+.field-control {
+	width: 100%;
+	padding: 12px 14px;
+	border-radius: 12px;
+	border: 1px solid rgba(75, 95, 78, 0.18);
+	font: inherit;
+	background: #fff;
+}
+
+.restaurant-info-strip {
+	align-items: stretch;
+}
+
+.restaurant-info-strip .feature-card p {
+	margin-bottom: 10px;
+}
+
+.menu-table {
+	display: grid;
+	gap: 14px;
+	margin-top: 16px;
+}
+
+.menu-row {
+	display: grid;
+	grid-template-columns: 2fr 1fr 120px;
+	gap: 14px;
+	padding: 14px;
+	border-radius: 16px;
+	background: #fffefb;
+	border: 1px solid rgba(75, 95, 78, 0.12);
+}
+
+.menu-cell label {
+	font-size: 0.82rem;
+	color: var(--muted);
+	margin-bottom: 6px;
+	display: block;
+	font-weight: 700;
+	letter-spacing: 0.03em;
+}
+
+.menu-cell input[type="text"],
+.menu-cell input[type="number"] {
+	width: 100%;
+	padding: 10px 12px;
+	border-radius: 10px;
+	border: 1px solid rgba(75, 95, 78, 0.2);
+	font: inherit;
+	background: #fff;
+}
+
+.menu-cell-toggle {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: flex-start;
+	padding-top: 2px;
+}
+
+.menu-cell-toggle input[type="checkbox"] {
+	width: 22px;
+	height: 22px;
+	margin-top: 8px;
+	accent-color: var(--deep-green);
+}
+
+.menu-display-list {
+	display: grid;
+	gap: 12px;
+	margin-top: 12px;
+}
+
+.menu-display-item {
+	display: flex;
+	justify-content: space-between;
+	gap: 14px;
+	padding: 14px;
+	border-radius: 14px;
+	background: #fffefb;
+	border: 1px solid rgba(75, 95, 78, 0.12);
+}
+
+.menu-display-item h3 {
+	margin: 0 0 6px;
+	font-size: 1.05rem;
+}
+
+.menu-display-item p {
+	margin: 0;
+	color: var(--muted);
+	line-height: 1.4;
+}
+
+.menu-display-meta {
+	text-align: right;
+	min-width: 120px;
+}
+
 @media (max-width: 640px) {
 	.page-shell {
 		width: min(100% - 20px, 1100px);
@@ -397,5 +507,17 @@ h3 {
 
 	.hero-stats {
 		flex-direction: column;
+	}
+
+	.menu-row {
+		grid-template-columns: 1fr;
+	}
+
+	.menu-display-item {
+		flex-direction: column;
+	}
+
+	.menu-display-meta {
+		text-align: left;
 	}
 }

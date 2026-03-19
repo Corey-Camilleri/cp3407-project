@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FeedMe | Restaurant Home</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <main class="page-shell">
+        <header class="topbar">
+            <div>
+                <p class="brand-mark">FeedMe</p>
+                <p class="brand-subtitle">Restaurant home for operations, profile details, and menu-level updates.</p>
+            </div>
+            <nav class="topnav" aria-label="Restaurant navigation">
+                <a href="index.html">Customer home</a>
+                <a href="#dashboard">Dashboard</a>
+                <a href="#menu-display">Menu</a>
+            </nav>
+        </header>
+
+        <section class="feature-strip restaurant-info-strip">
+            <article class="feature-card">
+                <p class="section-label">Profile</p>
+                <h2 id="profileName">Restaurant profile</h2>
+                <p id="profileDescription">No profile loaded yet.</p>
+            </article>
+        </section>
+
+        <section class="hero restaurant-hero" id="dashboard">
+            <div class="hero-copy-block">
+                <p class="eyebrow">Restaurant workspace</p>
+                <h1>View earnings of all restaurants.</h1>
+                <p class="hero-copy">
+                    Review profile, choose a restaurant, and view operational statistics with menu context.
+                </p>
+            </div>
+        </section>
+
+        <section class="list-panel">
+            <div class="panel-header">
+                <div>
+                    <p class="section-label">Restaurant selector</p>
+                    <h2>Select restaurant</h2>
+                    <p class="panel-copy">Choose which restaurant to load for stats and menu display.</p>
+                </div>
+            </div>
+
+                <label class="field-label" for="restaurantSelector">Select restaurant</label>
+                <select id="restaurantSelector" class="field-control"></select>
+                <p id="restaurantStatus" class="status-message">Loading restaurant data...</p>
+        </section>
+
+        <section class="list-panel">
+            <div class="panel-header">
+                <div>
+                    <p class="section-label">Stats</p>
+                    <h2>Restaurant statistics</h2>
+                    <p class="panel-copy">Performance summary for the selected restaurant.</p>
+                </div>
+            </div>
+            <aside class="hero-card">
+                <p class="section-label">At a glance</p>
+                <div class="hero-stats">
+                    <div>
+                        <strong id="ordersToday">0</strong>
+                        <span>Orders today</span>
+                    </div>
+                    <div>
+                        <strong id="todayRevenue">$0</strong>
+                        <span>Revenue today</span>
+                    </div>
+                </div>
+                <div class="hero-stats">
+                    <div>
+                        <strong id="avgOrderValue">$0</strong>
+                        <span>Average order value</span>
+                    </div>
+                    <div>
+                        <strong id="activeMenuItems">0</strong>
+                        <span>Active menu items</span>
+                    </div>
+                </div>
+            </aside>
+        </section>
+
+        <section class="feature-strip restaurant-info-strip">
+            <article class="feature-card">
+                <p class="section-label">Location and reach</p>
+                <p><strong>Contact:</strong> <span id="profilePhone">-</span></p>
+                <p><strong>Service radius:</strong> <span id="profileRadius">-</span></p>
+                <p><strong>Status:</strong> <span id="profileStatus">-</span></p>
+            </article>
+        </section>
+
+        <section id="menu-display" class="list-panel">
+            <div class="panel-header">
+                <div>
+                    <p class="section-label">Menu display</p>
+                    <h2>Restaurant menu (same as customer menu)</h2>
+                    <p class="panel-copy">This section is a restaurant-side view of the customer menu. Menu editor actions are linked below.</p>
+                </div>
+                <div class="hero-actions">
+                    <a class="primary-link" href="view_menu.html">Open customer menu page</a>
+                    <a class="secondary-link" href="add_menu_items.html">Open menu editor</a>
+                </div>
+            </div>
+
+            <div id="restaurantMenuDisplay" class="menu-display-list"></div>
+            <p id="menuImplementationNote" class="status-message">Menu display implementation can be extended here with real item/category data bindings.</p>
+        </section>
+    </main>
+
+    <script src="features/restaurant-home.js"></script>
+</body>
+</html>
