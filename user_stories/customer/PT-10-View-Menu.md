@@ -22,4 +22,4 @@ Description-v1: As a **customer**, I want to view a restaurant's menu (items + p
 - Link/attach Figma frame once confirmed.
 
 # Completed:
-- 
+-

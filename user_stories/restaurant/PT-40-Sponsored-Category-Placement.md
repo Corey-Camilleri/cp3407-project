@@ -22,4 +22,4 @@ Description-v1: As a **restaurant**, I want to pay for sponsored placement at th
 - Sponsored campaign setup page and sponsored badge in listing.
 
 # Completed:
-- 
+-

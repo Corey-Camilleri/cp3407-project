@@ -20,4 +20,4 @@ Description-v1: As a **customer**, I want to view my order receipt/summary, so I
 - Link/attach Figma frame once confirmed.
 
 # Completed:
-- 
+-

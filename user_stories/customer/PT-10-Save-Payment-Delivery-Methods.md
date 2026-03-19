@@ -22,4 +22,4 @@ Description-v1: As a **customer**, I want to save payment and delivery details, 
 - Account settings page for addresses and payment methods.
 
 # Completed:
-- 
+-

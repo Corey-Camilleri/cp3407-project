@@ -22,4 +22,4 @@ Description-v1: As a **customer**, I want to schedule an order for a later time,
 - Date/time picker in checkout with available slots.
 
 # Completed:
-- 
+-

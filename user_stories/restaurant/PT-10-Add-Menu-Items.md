@@ -22,4 +22,4 @@ Description-v1: As a **restaurant**, I want to add menu items, so customers can 
 - Add menu item form with preview and save action.
 
 # Completed:
-- 
+-

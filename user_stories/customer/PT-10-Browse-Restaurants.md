@@ -21,4 +21,4 @@ Description-v1: As a **customer**, I want to browse nearby restaurants, so I can
 - Link/attach Figma frame once confirmed.
 
 # Completed:
-- 
+-

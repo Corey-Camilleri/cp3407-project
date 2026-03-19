@@ -22,4 +22,4 @@ Description-v1: As a **customer**, I want to save favorite restaurants and meals
 - Favorites tab with restaurant and meal cards.
 
 # Completed:
-- 
+-

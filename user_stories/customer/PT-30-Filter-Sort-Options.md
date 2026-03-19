@@ -22,4 +22,4 @@ Description-v1: As a **customer**, I want to filter options by my preferences, s
 - Filter chips for dietary, price, and option preferences.
 
 # Completed:
-- 
+-

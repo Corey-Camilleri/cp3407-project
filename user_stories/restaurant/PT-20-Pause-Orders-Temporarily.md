@@ -22,4 +22,4 @@ Description-v1: As a **restaurant**, I want to pause incoming orders temporarily
 - Availability switch with pause reason and estimated resume time.
 
 # Completed:
-- 
+-
