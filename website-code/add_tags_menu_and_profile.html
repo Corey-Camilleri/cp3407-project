@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FeedMe | Add Tags</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .form-card {
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 12px;
+            max-width: 500px;
+            margin: 20px auto;
+        }
+        input, select, button {
+            width: 100%;
+            margin-top: 8px;
+            padding: 8px;
+        }
+        button {
+            background: #24422f;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        .tag-item {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 8px;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 6px;
+        }
+        .tag-item button {
+            background: #c33;
+            color: white;
+            border: none;
+            padding: 2px 6px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <main class="page-shell">
+        <section class="hero">
+            <h1>Add Tags</h1>
+            <p>Add tags to menu items or restaurant profile</p>
+        </section>
+
+        <section class="list-panel">
+            <div class="form-card">
+                <form id="tagsForm">
+
+                    <label>Tag Name:</label>
+                    <input type="text" id="tagName" placeholder="e.g. Spicy" required>
+
+                    <label>Apply To:</label>
+                    <select id="tagType">
+                        <option value="menu">Menu Item</option>
+                        <option value="profile">Restaurant Profile</option>
+                    </select>
+
+                    <!-- This only shows for menu items -->
+                    <div id="menuItemWrapper">
+                        <label>Select Menu Item:</label>
+                        <select id="menuItemSelect"></select>
+                    </div>
+
+                    <button type="submit">Add Tag</button>
+                </form>
+
+                <h2>Current Tags</h2>
+                <div id="tagsList"></div>
+            </div>
+        </section>
+    </main>
+
+    <script src="features/add-tags-menu-and-profile.js"></script>
+</body>
+</html>

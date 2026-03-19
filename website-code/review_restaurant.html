@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Restaurant Reviews</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <main class="page-shell">
+
+        <section class="hero">
+            <h1>Restaurant Reviews</h1>
+            <p>Leave a review to help others</p>
+        </section>
+
+        <section class="list-panel">
+
+            <!-- REVIEW FORM -->
+            <form id="reviewForm">
+                <label>Restaurant Name:</label>
+                <input type="text" id="restaurantName" required>
+
+                <label>Rating (1–5):</label>
+                <input type="number" id="rating" min="1" max="5" required>
+
+                <label>Comment:</label>
+                <textarea id="comment" required></textarea>
+
+                <button type="submit">Submit Review</button>
+            </form>
+
+            <hr>
+
+            <!-- REVIEWS DISPLAY -->
+            <h2>Reviews</h2>
+            <div id="reviewList"></div>
+
+        </section>
+
+    </main>
+
+    <script src="features/review-restaurant.js"></script>
+</body>
+</html>
