@@ -10,10 +10,25 @@ function formatRadius(radius) {
   return `${radius} km delivery radius`;
 }
 
+function buildPlaceholderImage(label, bgColor) {
+  const safeLabel = encodeURIComponent(label);
+  const safeBg = bgColor.replace('#', '%23');
+  return `data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='640' height='360'><rect width='100%' height='100%' fill='${safeBg}'/><text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle' fill='white' font-size='28' font-family='Arial'>${safeLabel}</text></svg>`;
+}
+
 function createRestaurantCard(restaurant) {
+  const logoSrc = restaurant.logoUrl || buildPlaceholderImage('Logo', '#24422f');
+  const displayImageSrc = restaurant.displayImageUrl || buildPlaceholderImage('Display Image', '#8b5e34');
+
   const card = document.createElement('article');
   card.className = 'restaurant-card';
+  card.setAttribute('role', 'link');
+  card.setAttribute('tabindex', '0');
   card.innerHTML = `
+    <div class="restaurant-visuals">
+      <img class="restaurant-display-image" src="${displayImageSrc}" alt="${restaurant.name || 'Restaurant'} display image">
+      <img class="restaurant-logo-image" src="${logoSrc}" alt="${restaurant.name || 'Restaurant'} logo">
+    </div>
     <div class="card-topline">
       <span class="status-pill">${restaurant.status}</span>
       <span class="restaurant-id">#${restaurant.id}</span>
@@ -31,6 +46,18 @@ function createRestaurantCard(restaurant) {
       </div>
     </dl>
   `;
+
+  const navigateToMenu = () => {
+    window.location.href = `view_menu.html?restaurantId=${encodeURIComponent(restaurant.id)}`;
+  };
+
+  card.addEventListener('click', navigateToMenu);
+  card.addEventListener('keydown', (event) => {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      navigateToMenu();
+    }
+  });
 
   return card;
 }

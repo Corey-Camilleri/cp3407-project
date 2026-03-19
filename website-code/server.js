@@ -56,7 +56,9 @@ app.get('/api/restaurants', async (req, res) => {
         description: restaurant.Description,
         phone: restaurant.Phone,
         serviceRadiusKm: restaurant.Service_Radius_KM,
-        status: restaurant.Status
+        status: restaurant.Status,
+        logoUrl: restaurant.Logo_URL || null,
+        displayImageUrl: restaurant.Display_Image_URL || restaurant.Logo_URL || null
       }))
     );
   } catch (err) {
