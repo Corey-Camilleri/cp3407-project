@@ -68,7 +68,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         form.reset();
 
-        renderReviews(); // 🔥 IMPORTANT: refresh UI immediately
+        renderReviews(); // refresh UI immediately
     });
 
     // Initial render on page load
