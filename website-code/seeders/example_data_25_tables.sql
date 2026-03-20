@@ -1,5 +1,5 @@
 -- Auto-generated sample data: 5 rows per table
-USE `cp3407_staging`;
+USE `cp3407`;
 SET FOREIGN_KEY_CHECKS = 0;
 
 -- Address
@@ -14,38 +14,73 @@ INSERT INTO `Address` (`Address_ID`, `Person_ID`, `Address_Type`, `Street`, `Cit
 -- Admin
 DELETE FROM `Admin`;
 INSERT INTO `Admin` (`Person_ID`, `Role_Type`, `Access_Level`) VALUES
-(1, 'Admin_Role_Type_1', 'Admin_Access_Level_1'),
-(2, 'Admin_Role_Type_2', 'Admin_Access_Level_2'),
-(3, 'Admin_Role_Type_3', 'Admin_Access_Level_3'),
-(4, 'Admin_Role_Type_4', 'Admin_Access_Level_4'),
-(5, 'Admin_Role_Type_5', 'Admin_Access_Level_5');
+(1, 'Support', 'L2'),
+(2, 'Operations', 'L2'),
+(3, 'Finance', 'L1'),
+(4, 'TrustSafety', 'L3'),
+(5, 'Platform', 'L3');
 
 -- Category
 DELETE FROM `Category`;
 INSERT INTO `Category` (`Category_ID`, `Menu_ID`, `Name`, `Sort_Order`) VALUES
-(1, 1, 'Category_Name_1', 1),
-(2, 2, 'Category_Name_2', 2),
-(3, 3, 'Category_Name_3', 3),
-(4, 4, 'Category_Name_4', 4),
-(5, 5, 'Category_Name_5', 5);
+(1, 1, 'Bowls', 1),
+(2, 1, 'Ramen', 2),
+(3, 1, 'Sides', 3),
+(4, 2, 'Tacos', 1),
+(5, 2, 'Nachos', 2),
+(6, 2, 'Drinks', 3),
+(7, 3, 'Pasta', 1),
+(8, 3, 'Salads', 2),
+(9, 3, 'Desserts', 3),
+(10, 4, 'Power Bowls', 1),
+(11, 4, 'Wraps', 2),
+(12, 4, 'Smoothies', 3),
+(13, 5, 'Burgers', 1),
+(14, 5, 'Chicken', 2),
+(15, 5, 'Shakes', 3);
 
 -- Category_Item
 DELETE FROM `Category_Item`;
 INSERT INTO `Category_Item` (`Item_ID`, `Category_ID`) VALUES
 (1, 1),
-(2, 2),
-(3, 3),
-(4, 4),
-(5, 5);
+(2, 1),
+(3, 2),
+(4, 2),
+(5, 3),
+(6, 3),
+(7, 4),
+(8, 4),
+(9, 4),
+(10, 5),
+(11, 5),
+(12, 6),
+(13, 7),
+(14, 7),
+(15, 7),
+(16, 8),
+(17, 8),
+(18, 9),
+(19, 10),
+(20, 10),
+(21, 11),
+(22, 11),
+(23, 12),
+(24, 12),
+(25, 13),
+(26, 13),
+(27, 13),
+(28, 14),
+(29, 14),
+(30, 15);
 
 -- Customer
 DELETE FROM `Customer`;
 INSERT INTO `Customer` (`Person_ID`, `Default_Address_ID`, `Loyalty_Points`, `Preferred_Payment_Method`) VALUES
-(1, 1, 1, 'Customer_Preferred_Payment_Method_1'),
-(2, 2, 2, 'Customer_Preferred_Payment_Method_2'),
-(3, 3, 3, 'Customer_Preferred_Payment_Method_3'),
-(4, 4, 4, 'Customer_Preferred_Payment_Method_4'),
-(5, 5, 5, 'Customer_Preferred_Payment_Method_5');
+(1, 1, 220, 'VISA'),
+(2, 2, 140, 'MasterCard'),
+(3, 3, 80, 'PayPal'),
+(4, 4, 360, 'ApplePay'),
+(5, 5, 40, 'Cash');
 
 -- Delivery
 DELETE FROM `Delivery`;
@@ -59,11 +94,11 @@ INSERT INTO `Delivery` (`Delivery_ID`, `Order_ID`, `Driver_Person_ID`, `Status`,
 -- Driver
 DELETE FROM `Driver`;
 INSERT INTO `Driver` (`Person_ID`, `License_Number`, `Vehicle_Type`, `Background_Check_Status`, `Is_Online`, `Rating_Avg`) VALUES
-(1, 'Driver_License_Number_1', 'Driver_Vehicle_Type_1', 'PENDING', 1, 1.10),
-(2, 'Driver_License_Number_2', 'Driver_Vehicle_Type_2', 'APPROVED', 0, 2.10),
-(3, 'Driver_License_Number_3', 'Driver_Vehicle_Type_3', 'REJECTED', 1, 3.10),
-(4, 'Driver_License_Number_4', 'Driver_Vehicle_Type_4', 'PENDING', 0, 4.10),
-(5, 'Driver_License_Number_5', 'Driver_Vehicle_Type_5', 'APPROVED', 1, 5.10);
+(11, 'QLD-DR-1001', 'Scooter', 'APPROVED', 1, 4.9),
+(12, 'QLD-DR-1002', 'Car', 'APPROVED', 1, 4.75),
+(13, 'QLD-DR-1003', 'Bike', 'APPROVED', 0, 4.6),
+(14, 'QLD-DR-1004', 'Car', 'APPROVED', 1, 4.82),
+(15, 'QLD-DR-1005', 'Scooter', 'PENDING', 0, 4.4);
 
 -- Driver_Location_Log
 DELETE FROM `Driver_Location_Log`;
@@ -86,11 +121,36 @@ INSERT INTO `Driver_Rating` (`Rating_ID`, `Driver_Person_ID`, `Score`, `Order_ID
 -- Item
 DELETE FROM `Item`;
 INSERT INTO `Item` (`Item_ID`, `Restaurant_ID`, `Name`, `Description`, `Base_Price`, `Is_Available`, `Image_URL`) VALUES
-(1, 1, 'Item_Name_1', 'Item_Description_1', 1.10, 1, 'Item_Image_URL_1'),
-(2, 2, 'Item_Name_2', 'Item_Description_2', 2.10, 0, 'Item_Image_URL_2'),
-(3, 3, 'Item_Name_3', 'Item_Description_3', 3.10, 1, 'Item_Image_URL_3'),
-(4, 4, 'Item_Name_4', 'Item_Description_4', 4.10, 0, 'Item_Image_URL_4'),
-(5, 5, 'Item_Name_5', 'Item_Description_5', 5.10, 1, 'Item_Image_URL_5');
+(1, 1, 'Teriyaki Chicken Bowl', 'Grilled chicken and rice', 15.9, 1, '/img/i-teriyaki.png'),
+(2, 1, 'Salmon Poke Bowl', 'Salmon poke with edamame', 18.5, 1, '/img/i-poke.png'),
+(3, 1, 'Spicy Beef Ramen', 'Rich broth and slow beef', 17.8, 1, '/img/i-ramen-beef.png'),
+(4, 1, 'Tonkotsu Ramen', 'Creamy pork broth ramen', 16.9, 1, '/img/i-ramen-tonk.png'),
+(5, 1, 'Gyoza 6pc', 'Pan-fried pork gyoza', 9.9, 1, '/img/i-gyoza.png'),
+(6, 1, 'Seaweed Salad', 'Sesame seaweed salad', 7.4, 1, '/img/i-seaweed.png'),
+(7, 2, 'Beef Birria Tacos', 'Slow-cooked birria tacos', 14.2, 1, '/img/i-birria.png'),
+(8, 2, 'Chicken Street Tacos', 'Chargrilled chicken tacos', 13.5, 1, '/img/i-chicken-tacos.png'),
+(9, 2, 'Fish Baja Tacos', 'Crispy fish and slaw', 14.8, 1, '/img/i-fish-tacos.png'),
+(10, 2, 'Loaded Nachos', 'Beef, cheese, jalapenos', 15.2, 1, '/img/i-nachos.png'),
+(11, 2, 'Fries Supreme', 'Loaded fries with salsa', 12.4, 1, '/img/i-fries-supreme.png'),
+(12, 2, 'Horchata', 'Sweet cinnamon rice drink', 5.5, 1, '/img/i-horchata.png'),
+(13, 3, 'Chicken Alfredo', 'Creamy alfredo fettuccine', 19.2, 1, '/img/i-alfredo.png'),
+(14, 3, 'Spaghetti Bolognese', 'Classic beef bolognese', 18.4, 1, '/img/i-bolognese.png'),
+(15, 3, 'Pesto Penne', 'Basil pesto and parmesan', 17.5, 1, '/img/i-pesto.png'),
+(16, 3, 'Caesar Salad', 'Cos lettuce and croutons', 13.2, 1, '/img/i-caesar.png'),
+(17, 3, 'Rocket Pear Salad', 'Rocket, pear and walnuts', 14.1, 1, '/img/i-rocket-pear.png'),
+(18, 3, 'Tiramisu', 'Coffee layered dessert', 8.8, 1, '/img/i-tiramisu.png'),
+(19, 4, 'Protein Power Bowl', 'Chicken, quinoa and kale', 16.7, 1, '/img/i-power-bowl.png'),
+(20, 4, 'Vegan Green Bowl', 'Tofu, rice and greens', 15.6, 1, '/img/i-vegan-bowl.png'),
+(21, 4, 'Falafel Wrap', 'Falafel, tahini, veggies', 12.9, 1, '/img/i-falafel-wrap.png'),
+(22, 4, 'Chicken Avocado Wrap', 'Chicken with avocado', 13.9, 1, '/img/i-avocado-wrap.png'),
+(23, 4, 'Berry Blast Smoothie', 'Mixed berries and yogurt', 7.9, 1, '/img/i-berry-smoothie.png'),
+(24, 4, 'Mango Green Smoothie', 'Mango spinach smoothie', 7.7, 1, '/img/i-mango-smoothie.png'),
+(25, 5, 'Classic Beef Burger', 'Beef patty with pickles', 14.6, 1, '/img/i-classic-burger.png'),
+(26, 5, 'Double Cheeseburger', 'Double beef and cheese', 17.2, 1, '/img/i-double-burger.png'),
+(27, 5, 'Crispy Chicken Burger', 'Crispy chicken and slaw', 15.3, 1, '/img/i-chicken-burger.png'),
+(28, 5, 'Buffalo Wings 8pc', 'Spicy buffalo wings', 12.8, 1, '/img/i-wings.png'),
+(29, 5, 'Loaded Fries', 'Cheese, bacon and aioli', 10.9, 1, '/img/i-loaded-fries.png'),
+(30, 5, 'Vanilla Shake', 'Thick vanilla milkshake', 6.9, 1, '/img/i-vanilla-shake.png');
 
 -- Item_Option
 DELETE FROM `Item_Option`;
@@ -113,20 +173,20 @@ INSERT INTO `Item_Option_Group` (`Group_ID`, `Item_ID`, `Name`, `Min_Select`, `M
 -- Menu
 DELETE FROM `Menu`;
 INSERT INTO `Menu` (`Menu_ID`, `Restaurant_ID`, `Name`, `Is_Active`) VALUES
-(1, 1, 'Menu_Name_1', 1),
-(2, 2, 'Menu_Name_2', 0),
-(3, 3, 'Menu_Name_3', 1),
-(4, 4, 'Menu_Name_4', 0),
-(5, 5, 'Menu_Name_5', 1);
+(1, 1, 'Sakura Main Menu', 1),
+(2, 2, 'Urban Tacos Menu', 1),
+(3, 3, 'Bella Pasta Menu', 1),
+(4, 4, 'Green Leaf Menu', 1),
+(5, 5, 'Sunrise Menu', 1);
 
 -- Merchant
 DELETE FROM `Merchant`;
 INSERT INTO `Merchant` (`Person_ID`, `Business_Name`, `Business_Type`, `Tax_ID`, `Approval_Status`) VALUES
-(1, 'Merchant_Business_Name_1', 'Merchant_Business_Type_1', 'Merchant_Tax_ID_1', 'PENDING'),
-(2, 'Merchant_Business_Name_2', 'Merchant_Business_Type_2', 'Merchant_Tax_ID_2', 'APPROVED'),
-(3, 'Merchant_Business_Name_3', 'Merchant_Business_Type_3', 'Merchant_Tax_ID_3', 'REJECTED'),
-(4, 'Merchant_Business_Name_4', 'Merchant_Business_Type_4', 'Merchant_Tax_ID_4', 'SUSPENDED'),
-(5, 'Merchant_Business_Name_5', 'Merchant_Business_Type_5', 'Merchant_Tax_ID_5', 'PENDING');
+(6, 'Sakura Bowl Co', 'Japanese', 'AUS-TAX-2001', 'APPROVED'),
+(7, 'Urban Tacos', 'Mexican', 'AUS-TAX-2002', 'APPROVED'),
+(8, 'Bella Pasta Bar', 'Italian', 'AUS-TAX-2003', 'APPROVED'),
+(9, 'Green Leaf Kitchen', 'Healthy', 'AUS-TAX-2004', 'APPROVED'),
+(10, 'Sunrise Burgers', 'Burgers', 'AUS-TAX-2005', 'APPROVED');
 
 -- Order
 DELETE FROM `Order`;
@@ -176,11 +236,21 @@ INSERT INTO `Payment` (`Payment_ID`, `Order_ID`, `Provider`, `Provider_Transacti
 -- Person
 DELETE FROM `Person`;
 INSERT INTO `Person` (`Person_ID`, `First_Name`, `Last_Name`, `Email`, `Phone`, `Password_Hash`, `Account_Status`, `Created_At`) VALUES
-(1, 'Person_First_Name_1', 'Person_Last_Name_1', 'Person_Email_1', 1, 'Person_Password_Hash_1', 'ACTIVE', '2026-01-01 10:00:00'),
-(2, 'Person_First_Name_2', 'Person_Last_Name_2', 'Person_Email_2', 2, 'Person_Password_Hash_2', 'SUSPENDED', '2026-01-02 10:00:00'),
-(3, 'Person_First_Name_3', 'Person_Last_Name_3', 'Person_Email_3', 3, 'Person_Password_Hash_3', 'DEACTIVATED', '2026-01-03 10:00:00'),
-(4, 'Person_First_Name_4', 'Person_Last_Name_4', 'Person_Email_4', 4, 'Person_Password_Hash_4', 'BANNED', '2026-01-04 10:00:00'),
-(5, 'Person_First_Name_5', 'Person_Last_Name_5', 'Person_Email_5', 5, 'Person_Password_Hash_5', 'ACTIVE', '2026-01-05 10:00:00');
+(1, 'Emma', 'Nguyen', 'emma.nguyen@feedme.com', 40111001, 'hash_emma', 'ACTIVE', '2026-02-01 09:00:00'),
+(2, 'Liam', 'Carter', 'liam.carter@feedme.com', 40111002, 'hash_liam', 'ACTIVE', '2026-02-01 09:05:00'),
+(3, 'Sophia', 'Wilson', 'sophia.wilson@feedme.com', 40111003, 'hash_sophia', 'ACTIVE', '2026-02-01 09:10:00'),
+(4, 'Noah', 'Brown', 'noah.brown@feedme.com', 40111004, 'hash_noah', 'ACTIVE', '2026-02-01 09:15:00'),
+(5, 'Ava', 'Patel', 'ava.patel@feedme.com', 40111005, 'hash_ava', 'ACTIVE', '2026-02-01 09:20:00'),
+(6, 'Mason', 'Lee', 'mason.lee@feedme.com', 40111006, 'hash_mason', 'ACTIVE', '2026-02-02 08:30:00'),
+(7, 'Charlotte', 'Davis', 'charlotte.davis@feedme.com', 40111007, 'hash_charlotte', 'ACTIVE', '2026-02-02 08:40:00'),
+(8, 'Ethan', 'Miller', 'ethan.miller@feedme.com', 40111008, 'hash_ethan', 'ACTIVE', '2026-02-02 08:50:00'),
+(9, 'Mia', 'Lopez', 'mia.lopez@feedme.com', 40111009, 'hash_mia', 'ACTIVE', '2026-02-02 09:00:00'),
+(10, 'Lucas', 'King', 'lucas.king@feedme.com', 40111010, 'hash_lucas', 'ACTIVE', '2026-02-02 09:10:00'),
+(11, 'Harper', 'Scott', 'harper.scott@feedme.com', 40111011, 'hash_harper', 'ACTIVE', '2026-02-03 10:00:00'),
+(12, 'James', 'Green', 'james.green@feedme.com', 40111012, 'hash_james', 'ACTIVE', '2026-02-03 10:10:00'),
+(13, 'Amelia', 'Hall', 'amelia.hall@feedme.com', 40111013, 'hash_amelia', 'ACTIVE', '2026-02-03 10:20:00'),
+(14, 'Benjamin', 'Young', 'ben.young@feedme.com', 40111014, 'hash_ben', 'ACTIVE', '2026-02-03 10:30:00'),
+(15, 'Ella', 'Allen', 'ella.allen@feedme.com', 40111015, 'hash_ella', 'ACTIVE', '2026-02-03 10:40:00');
 
 -- Rating
 DELETE FROM `Rating`;
@@ -203,11 +273,11 @@ INSERT INTO `Refund` (`Refund_ID`, `Payment_ID`, `Amount`, `Reason`, `Status`, `
 -- Restaurant
 DELETE FROM `Restaurant`;
 INSERT INTO `Restaurant` (`Restaurant_ID`, `Merchant_Person_ID`, `Name`, `Phone`, `Description`, `Logo_URL`, `Status`, `Service_Radius_KM`) VALUES
-(1, 1, 'Restaurant_Name_1', 1, 'Restaurant_Description_1', 'Restaurant_Logo_URL_1', 'ACTIVE', 1.10),
-(2, 2, 'Restaurant_Name_2', 2, 'Restaurant_Description_2', 'Restaurant_Logo_URL_2', 'INACTIVE', 2.10),
-(3, 3, 'Restaurant_Name_3', 3, 'Restaurant_Description_3', 'Restaurant_Logo_URL_3', 'TEMP_CLOSED', 3.10),
-(4, 4, 'Restaurant_Name_4', 4, 'Restaurant_Description_4', 'Restaurant_Logo_URL_4', 'SUSPENDED', 4.10),
-(5, 5, 'Restaurant_Name_5', 5, 'Restaurant_Description_5', 'Restaurant_Logo_URL_5', 'ACTIVE', 5.10);
+(1, 6, 'Sakura Bowl', 47221001, 'Fresh rice bowls and ramen', '/img/sakura-logo.png', 'ACTIVE', 8.5),
+(2, 7, 'Urban Tacos', 47221002, 'Street tacos and loaded fries', '/img/taco-logo.png', 'ACTIVE', 7),
+(3, 8, 'Bella Pasta', 47221003, 'Handmade pasta and salads', '/img/pasta-logo.png', 'ACTIVE', 6.5),
+(4, 9, 'Green Leaf', 47221004, 'Healthy bowls and wraps', '/img/green-logo.png', 'ACTIVE', 9),
+(5, 10, 'Sunrise Burgers', 47221005, 'Burgers, wings and shakes', '/img/burger-logo.png', 'ACTIVE', 10);
 
 -- Restaurant_Rating_ID
 DELETE FROM `Restaurant_Rating_ID`;

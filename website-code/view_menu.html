@@ -5,29 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FeedMe | View Menu</title>
     <link rel="stylesheet" href="style.css">
-    <style>
-        /* Minimal inline styles; main styles from style.css */
-        .menu-card {
-            border: 1px solid #ccc;
-            border-radius: 6px;
-            padding: 12px;
-            margin-bottom: 8px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        button.remove-btn {
-            background-color: #c33;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            padding: 4px 8px;
-            cursor: pointer;
-        }
-    </style>
 </head>
 <body>
     <main class="page-shell">
+        <section class="menu-topbar">
+            <button id="backButton" class="menu-back-button" type="button" aria-label="Go back to previous page">← Back</button>
+        </section>
+
+        <section id="restaurantProfile" class="restaurant-profile" aria-live="polite"></section>
+
         <section class="hero">
             <p class="eyebrow">Restaurant Menu</p>
             <h1>Current Menu</h1>
@@ -35,12 +21,13 @@
         </section>
 
         <section class="list-panel">
-            <div id="menuContainer">
+            <div id="categoryTabs" class="menu-category-tabs" aria-label="Menu categories"></div>
+            <div id="menuContainer" class="menu-category-sections">
                 <!-- Menu items will be dynamically inserted here -->
             </div>
         </section>
     </main>
 
-    <script src="view-menu.js"></script>
+    <script src="features/view-menu.js"></script>
 </body>
 </html>
