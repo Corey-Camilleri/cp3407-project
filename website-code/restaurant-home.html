@@ -5,6 +5,24 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FeedMe | Restaurant Home</title>
     <link rel="stylesheet" href="style.css">
+    <style>
+        /* Boxed selector styling */
+        .selector-row{
+            background:#fff;
+            border:1px solid #e6eef8;
+            border-radius:10px;
+            padding:14px 16px;
+            box-shadow:0 8px 20px rgba(11,20,50,0.04);
+            margin-top:12px;
+        }
+        .selector-row{color:#000;font-size:13px}
+        .selector-row .field-label{margin:0 0 8px 0;font-weight:600;color:#000;font-size:13px}
+        .selector-controls{display:flex;gap:10px;align-items:center}
+        .selector-controls select{flex:1;min-width:0;height:40px;padding:6px 8px;border-radius:8px;border:1px solid #dbeafe;background:#fbfdff;color:#000;font-size:13px}
+        .selector-controls select option{color:#000;font-size:13px}
+        .selector-controls select{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+        .selector-controls .secondary-link{display:inline-flex;align-items:center;height:40px;padding:6px 12px;border-radius:8px;background:#eef2ff;color:#000;text-decoration:none;border:1px solid #dbeafe;font-size:13px}
+    </style>
 </head>
 <body>
     <main class="page-shell">
@@ -47,9 +65,14 @@
                 </div>
             </div>
 
+            <div class="selector-row">
                 <label class="field-label" for="restaurantSelector">Select restaurant</label>
-                <select id="restaurantSelector" class="field-control"></select>
+                <div class="selector-controls" style="display:flex;gap:10px;align-items:center">
+                    <select id="restaurantSelector" class="field-control" style="min-width:260px"></select>
+                    <a class="secondary-link" href="add_restaurant_profile.html" title="Create or edit restaurant profile">Create / Edit Profile</a>
+                </div>
                 <p id="restaurantStatus" class="status-message">Loading restaurant data...</p>
+            </div>
         </section>
 
         <section class="list-panel">
