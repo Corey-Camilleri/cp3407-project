@@ -6,13 +6,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const openingHoursBackdrop = document.getElementById('openingHoursBackdrop');
     const openingHoursOverlay = document.getElementById('openingHoursOverlay');
-    const openingHoursForm = document.getElementById('openingHoursForm');
     const openingHoursEditorList = document.getElementById('openingHoursEditorList');
-    const clearHoursFormButton = document.getElementById('clearHoursFormButton');
-
-    const hoursDay = document.getElementById('hoursDay');
-    const hoursOpenTime = document.getElementById('hoursOpenTime');
-    const hoursCloseTime = document.getElementById('hoursCloseTime');
+    const openingHoursEditSaveButton = document.getElementById('openingHoursEditSaveButton');
 
     const dayOrder = {
         Monday: 1,
@@ -25,9 +20,12 @@ document.addEventListener('DOMContentLoaded', () => {
     };
     const orderedDays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
-    if (!restaurantSelector || !openingHoursStatus || !openingHoursList || !openingHoursOverlay || !openingHoursBackdrop || !openingHoursForm || !openingHoursEditorList || !hoursDay || !hoursOpenTime || !hoursCloseTime) {
+    if (!restaurantSelector || !openingHoursStatus || !openingHoursList || !openingHoursOverlay || !openingHoursBackdrop || !openingHoursEditorList || !openingHoursEditSaveButton) {
         return;
     }
+
+    let editMode = false;
+    let editorHours = [];
 
     function getRestaurantId() {
         return restaurantSelector.value ? String(restaurantSelector.value) : '';
@@ -98,6 +96,29 @@ document.addEventListener('DOMContentLoaded', () => {
         return `${item.day}: ${item.open} - ${item.close}`;
     }
 
+    function normalizeEditorHours(hours) {
+        const byDay = new Map(hours.map((item) => [item.day, item]));
+
+        return orderedDays.map((day) => {
+            const match = byDay.get(day);
+            if (!match) {
+                return {
+                    day,
+                    open: '09:00',
+                    close: '17:00',
+                    closed: true
+                };
+            }
+
+            return {
+                day,
+                open: match.open,
+                close: match.close,
+                closed: false
+            };
+        });
+    }
+
     function groupConsecutiveHours(hours) {
         if (!hours.length) {
             return [];
@@ -151,6 +172,8 @@ document.addEventListener('DOMContentLoaded', () => {
         openingHoursOverlay.hidden = true;
         openingHoursBackdrop.hidden = true;
         openingHoursOverlay.setAttribute('aria-hidden', 'true');
+        editMode = false;
+        openingHoursEditSaveButton.textContent = 'Edit';
     }
 
     async function renderPublicHours() {
@@ -187,45 +210,68 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     async function renderEditorHours() {
-        const restaurantId = getRestaurantId();
-        const hours = sortHours(await readHours(restaurantId));
         openingHoursEditorList.innerHTML = '';
 
-        if (!restaurantId) {
-            openingHoursEditorList.innerHTML = '<p class="status-message">Select a restaurant first.</p>';
-            return;
-        }
-
-        if (!hours.length) {
-            openingHoursEditorList.innerHTML = '<p class="status-message">No opening hours set.</p>';
-            return;
-        }
-
-        hours.forEach((item, index) => {
+        editorHours.forEach((item, index) => {
             const row = document.createElement('article');
             row.className = 'menu-display-item';
 
             const details = document.createElement('div');
-            details.innerHTML = `<h3>${item.day}</h3><p>${item.open} - ${item.close}</p>`;
+            const dayTitle = document.createElement('h3');
+            dayTitle.textContent = item.day;
+
+            const timeRow = document.createElement('div');
+            timeRow.className = 'opening-hours-time-row';
+
+            const openInput = document.createElement('input');
+            openInput.type = 'time';
+            openInput.value = item.open;
+            openInput.disabled = !editMode || item.closed;
+            openInput.addEventListener('change', (event) => {
+                editorHours[index].open = event.target.value;
+            });
+
+            const separator = document.createElement('span');
+            separator.textContent = 'to';
+
+            const closeInput = document.createElement('input');
+            closeInput.type = 'time';
+            closeInput.value = item.close;
+            closeInput.disabled = !editMode || item.closed;
+            closeInput.addEventListener('change', (event) => {
+                editorHours[index].close = event.target.value;
+            });
+
+            const closedText = document.createElement('p');
+            closedText.className = 'status-message';
+            closedText.textContent = item.closed ? 'Closed' : '';
+
+            timeRow.appendChild(openInput);
+            timeRow.appendChild(separator);
+            timeRow.appendChild(closeInput);
+
+            details.appendChild(dayTitle);
+            details.appendChild(timeRow);
+            details.appendChild(closedText);
 
             const actions = document.createElement('div');
             actions.className = 'menu-display-meta';
 
-            const removeButton = document.createElement('button');
-            removeButton.type = 'button';
-            removeButton.className = 'menu-remove-submit';
-            removeButton.textContent = 'Remove';
-            removeButton.addEventListener('click', async () => {
-                try {
-                    await deleteHour(restaurantId, item.day);
-                    await renderEditorHours();
-                    await renderPublicHours();
-                } catch (error) {
-                    openingHoursStatus.textContent = error.message;
+            const closedToggleButton = document.createElement('button');
+            closedToggleButton.type = 'button';
+            closedToggleButton.className = 'menu-remove-submit';
+            closedToggleButton.textContent = item.closed ? 'Cancel' : 'Closed';
+            closedToggleButton.disabled = !editMode;
+            closedToggleButton.addEventListener('click', async () => {
+                if (!editMode) {
+                    return;
                 }
+
+                editorHours[index].closed = !editorHours[index].closed;
+                await renderEditorHours();
             });
 
-            actions.appendChild(removeButton);
+            actions.appendChild(closedToggleButton);
             row.appendChild(details);
             row.appendChild(actions);
             openingHoursEditorList.appendChild(row);
@@ -243,6 +289,10 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
+        const currentHours = sortHours(await readHours(getRestaurantId()));
+        editorHours = normalizeEditorHours(currentHours);
+        editMode = false;
+        openingHoursEditSaveButton.textContent = 'Edit';
         await renderEditorHours();
         openOverlay();
     });
@@ -268,33 +318,41 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    openingHoursForm.addEventListener('submit', async (event) => {
-        event.preventDefault();
-
+    openingHoursEditSaveButton.addEventListener('click', async () => {
         const restaurantId = getRestaurantId();
-        const day = hoursDay.value;
-        const open = hoursOpenTime.value;
-        const close = hoursCloseTime.value;
+        if (!restaurantId) {
+            return;
+        }
 
-        if (!restaurantId || !day || !open || !close) {
+        if (!editMode) {
+            editMode = true;
+            openingHoursEditSaveButton.textContent = 'Save';
+            await renderEditorHours();
             return;
         }
 
         try {
-            await upsertHour(restaurantId, { day, open, close });
-            openingHoursForm.reset();
+            for (const item of editorHours) {
+                if (item.closed) {
+                    await deleteHour(restaurantId, item.day);
+                } else {
+                    await upsertHour(restaurantId, {
+                        day: item.day,
+                        open: item.open,
+                        close: item.close
+                    });
+                }
+            }
+
+            editMode = false;
+            openingHoursEditSaveButton.textContent = 'Edit';
             await renderAllHours();
+            await renderEditorHours();
             openingHoursStatus.textContent = 'Opening hours updated.';
         } catch (error) {
             openingHoursStatus.textContent = error.message;
         }
     });
-
-    if (clearHoursFormButton) {
-        clearHoursFormButton.addEventListener('click', () => {
-            openingHoursForm.reset();
-        });
-    }
 
     restaurantSelector.addEventListener('change', async () => {
         await renderAllHours();

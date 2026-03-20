@@ -160,36 +160,11 @@
                 <button type="button" class="menu-editor-close" data-close-opening-hours aria-label="Close opening hours editor">✕</button>
             </header>
 
-            <form id="openingHoursForm" class="menu-editor-form">
-                <label for="hoursDay">Day
-                    <select id="hoursDay" required>
-                        <option value="Monday">Monday</option>
-                        <option value="Tuesday">Tuesday</option>
-                        <option value="Wednesday">Wednesday</option>
-                        <option value="Thursday">Thursday</option>
-                        <option value="Friday">Friday</option>
-                        <option value="Saturday">Saturday</option>
-                        <option value="Sunday">Sunday</option>
-                    </select>
-                </label>
+            <p class="section-label">Weekly schedule</p>
+            <div id="openingHoursEditorList" class="menu-display-list"></div>
 
-                <label for="hoursOpenTime">Open time
-                    <input type="time" id="hoursOpenTime" required>
-                </label>
-
-                <label for="hoursCloseTime">Close time
-                    <input type="time" id="hoursCloseTime" required>
-                </label>
-
-                <div class="menu-editor-overlay-actions">
-                    <button type="submit" class="primary-link">Add / Update</button>
-                    <button type="button" id="clearHoursFormButton" class="secondary-link">Clear</button>
-                </div>
-            </form>
-
-            <div>
-                <p class="section-label">Current hours</p>
-                <div id="openingHoursEditorList" class="menu-display-list"></div>
+            <div class="menu-editor-overlay-footer-fixed">
+                <button type="button" id="openingHoursEditSaveButton" class="primary-link">Edit</button>
             </div>
         </article>
     </section>

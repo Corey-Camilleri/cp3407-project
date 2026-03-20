@@ -512,6 +512,21 @@ h3 {
 	min-width: 120px;
 }
 
+.opening-hours-time-row {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	margin-top: 8px;
+}
+
+.opening-hours-time-row input[type="time"] {
+	padding: 8px 10px;
+	border-radius: 10px;
+	border: 1px solid rgba(75, 95, 78, 0.2);
+	font: inherit;
+	background: #fff;
+}
+
 .menu-category-tabs {
 	display: flex;
 	flex-wrap: wrap;
