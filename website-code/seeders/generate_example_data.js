@@ -2,6 +2,26 @@ const fs = require('fs');
 const path = require('path');
 const mysql = require('mysql2/promise');
 
+const DEFAULT_ROWS_PER_TABLE = Number(process.env.SEED_DEFAULT_ROWS || 15);
+const TABLE_ROW_OVERRIDES = {
+  Address: 20,
+  Cart_Item: 30,
+  Delivery: 30,
+  Driver_Rating: 20,
+  Driver_Location_Log: 30,
+  Item_Option: 25,
+  Item_Option_Group: 20,
+  Order: 30,
+  Order_Item: 40,
+  Order_Item_Option: 40,
+  Order_Status_History: 40,
+  Payment: 30,
+  Rating: 20,
+  Refund: 20,
+  Restaurant_Rating_ID: 20,
+  Support_Ticket: 20
+};
+
 function parseVarcharLength(columnType) {
   const match = String(columnType || '').match(/\((\d+)\)/);
   return match ? Number(match[1]) : null;
@@ -21,6 +41,18 @@ function parseEnumValues(columnType) {
 
 function escapeSqlString(value) {
   return `'${String(value).replace(/\\/g, '\\\\').replace(/'/g, "\\'")}'`;
+}
+
+function buildCalendarDate(rowIndex) {
+  const day = ((rowIndex - 1) % 28) + 1;
+  const month = (Math.floor((rowIndex - 1) / 28) % 12) + 1;
+  return `2026-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+}
+
+function buildClockTime(rowIndex) {
+  const hour = 8 + ((rowIndex - 1) % 12);
+  const minute = ((rowIndex - 1) * 7) % 60;
+  return `${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}:00`;
 }
 
 const CUSTOM_TABLE_ROWS = {
@@ -154,6 +186,14 @@ function getCustomTableRows(tableName) {
   return CUSTOM_TABLE_ROWS[tableName] || null;
 }
 
+function getRowCountForTable(tableName, customRows) {
+  if (customRows && customRows.length > 0) {
+    return customRows.length;
+  }
+
+  return TABLE_ROW_OVERRIDES[tableName] || DEFAULT_ROWS_PER_TABLE;
+}
+
 function buildCustomValue(column, customRow, rowIndex, tableIndex) {
   const hasValue = Object.prototype.hasOwnProperty.call(customRow, column.COLUMN_NAME);
 
@@ -221,15 +261,15 @@ function buildValue(column, rowIndex, tableIndex) {
   }
 
   if (dataType === 'date') {
-    return escapeSqlString(`2026-01-0${rowIndex}`);
+    return escapeSqlString(buildCalendarDate(rowIndex));
   }
 
   if (['datetime', 'timestamp'].includes(dataType)) {
-    return escapeSqlString(`2026-01-0${rowIndex} 10:00:00`);
+    return escapeSqlString(`${buildCalendarDate(rowIndex)} ${buildClockTime(rowIndex)}`);
   }
 
   if (dataType === 'time') {
-    return escapeSqlString(`10:0${rowIndex}:00`);
+    return escapeSqlString(buildClockTime(rowIndex));
   }
 
   if (dataType === 'year') {
@@ -249,10 +289,10 @@ function buildValue(column, rowIndex, tableIndex) {
 
 async function generate() {
   const connection = await mysql.createConnection({
-    host: 'localhost',
-    user: 'root',
-    password: 'password',
-    database: 'cp3407'
+    host: process.env.DB_HOST || 'localhost',
+    user: process.env.DB_USER || 'root',
+    password: process.env.DB_PASS || 'password',
+    database: process.env.DB_NAME || 'cp3407'
   });
 
   const [tables] = await connection.query(`
@@ -263,8 +303,8 @@ async function generate() {
   `);
 
   const statements = [];
-  statements.push('-- Auto-generated sample data: 5 rows per table');
-  statements.push('USE `cp3407`;');
+  statements.push(`-- Auto-generated sample data: default ${DEFAULT_ROWS_PER_TABLE} rows per table with table-specific overrides`);
+  statements.push(`USE \`${process.env.DB_NAME || 'cp3407'}\`;`);
   statements.push('SET FOREIGN_KEY_CHECKS = 0;');
   statements.push('');
 
@@ -305,7 +345,9 @@ async function generate() {
         rows.push(`(${values.join(', ')})`);
       });
     } else {
-      for (let rowIndex = 1; rowIndex <= 5; rowIndex += 1) {
+      const rowCount = getRowCountForTable(tableName, customRows);
+
+      for (let rowIndex = 1; rowIndex <= rowCount; rowIndex += 1) {
         const values = insertableColumns.map((column) => buildValue(column, rowIndex, tableIndex));
         rows.push(`(${values.join(', ')})`);
       }
