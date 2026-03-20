@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FeedMe | Menu Editor</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <main class="page-shell">
+        <section class="menu-topbar">
+            <button id="backButton" class="menu-back-button" type="button" aria-label="Go back to previous page">← Back</button>
+        </section>
+
+        <section id="restaurantProfile" class="restaurant-profile" aria-live="polite"></section>
+
+        <section class="hero">
+            <p class="eyebrow">Menu Editor</p>
+            <h1>Edit restaurant menu</h1>
+            <p class="hero-copy">Looks like customer view with optional edit mode for restaurant owners.</p>
+        </section>
+
+        <section class="list-panel">
+            <div class="menu-editor-controls">
+                <button id="editModeButton" class="primary-link" type="button">Edit Menu</button>
+                <div id="editActions" class="menu-editor-action-row" hidden>
+                    <button id="openAddOverlayButton" class="refresh-button" type="button">Add</button>
+                </div>
+            </div>
+
+            <div id="editorStatus" class="status-message">Loading menu...</div>
+            <div id="categoryTabs" class="menu-category-tabs" aria-label="Menu categories"></div>
+            <div id="menuContainer" class="menu-category-sections"></div>
+        </section>
+    </main>
+
+    <div id="editorBackdrop" class="menu-editor-backdrop" hidden></div>
+
+    <section id="addItemOverlay" class="menu-editor-overlay" hidden>
+        <div class="menu-editor-overlay-card">
+            <div class="menu-editor-overlay-header">
+                <h2>Add menu item</h2>
+                <button type="button" class="menu-editor-close" data-close-overlay="addItemOverlay">✕</button>
+            </div>
+            <form id="addItemForm" class="menu-editor-form">
+                <label>Item name<input id="addItemName" type="text" required></label>
+                <label>Category<input id="addItemCategory" type="text" placeholder="e.g. Deals"></label>
+                <label>Description<textarea id="addItemDescription" rows="3"></textarea></label>
+                <label>Image URL<input id="addItemImage" type="text"></label>
+                <label>Price ($)<input id="addItemPrice" type="number" step="0.01" required></label>
+                <button class="primary-link" type="submit">Save item</button>
+            </form>
+        </div>
+    </section>
+
+    <section id="itemDetailsOverlay" class="menu-editor-overlay" hidden>
+        <div class="menu-editor-overlay-card">
+            <div class="menu-editor-overlay-header">
+                <h2 id="itemOverlayHeading">Menu item details</h2>
+                <button type="button" class="menu-editor-close" data-close-overlay="itemDetailsOverlay">✕</button>
+            </div>
+            <form id="itemDetailsForm" class="menu-editor-form">
+                <label>Item name<input id="detailItemName" type="text" required disabled></label>
+                <label>Category<input id="detailItemCategory" type="text" disabled></label>
+                <label>Description<textarea id="detailItemDescription" rows="3" disabled></textarea></label>
+                <label>Image URL<input id="detailItemImage" type="text" disabled></label>
+                <label>Price ($)<input id="detailItemPrice" type="number" step="0.01" required disabled></label>
+                <div class="menu-editor-overlay-actions">
+                    <button id="removeItemButton" class="menu-remove-submit" type="button" hidden>Remove item</button>
+                    <button id="saveItemButton" class="primary-link" type="submit" hidden>Save changes</button>
+                </div>
+            </form>
+        </div>
+    </section>
+
+    <script src="features/customer-menu-item-overlay.js"></script>
+    <script src="features/menu-editor.js"></script>
+    <script src="features/cart-overlay.js"></script>
+</body>
+</html>
