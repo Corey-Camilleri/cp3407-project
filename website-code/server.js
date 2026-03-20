@@ -66,6 +66,38 @@ app.get('/api/restaurants', async (req, res) => {
   }
 });
 
+app.get('/api/menu-items', async (req, res) => {
+  try {
+    const restaurantId = req.query.restaurantId;
+    const where = {
+      Is_Available: true
+    };
+
+    if (restaurantId) {
+      where.Restaurant_ID = Number(restaurantId);
+    }
+
+    const items = await models.Item.findAll({
+      where,
+      order: [['Name', 'ASC']]
+    });
+
+    res.json(
+      items.map((item) => ({
+        id: item.Item_ID,
+        restaurantId: item.Restaurant_ID,
+        name: item.Name,
+        description: item.Description,
+        price: Number(item.Base_Price || 0),
+        imageUrl: item.Image_URL || null,
+        available: Boolean(item.Is_Available)
+      }))
+    );
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // Serve your index.html
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));
