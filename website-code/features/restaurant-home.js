@@ -130,6 +130,12 @@ function renderSelectedRestaurant(restaurantId) {
   renderStats(restaurant, menuItems.filter((item) => item.available).length);
   renderMenuDisplay(restaurant);
   restaurantStatus.textContent = `Showing dashboard for ${restaurant.name}.`;
+
+  document.dispatchEvent(new CustomEvent('restaurant:selected', {
+    detail: {
+      restaurantId: String(restaurant.id)
+    }
+  }));
 }
 
 function populateSelector() {
