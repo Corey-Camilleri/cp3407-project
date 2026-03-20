@@ -17,7 +17,7 @@
         <section class="hero">
             <p class="eyebrow">Menu Editor</p>
             <h1>Edit restaurant menu</h1>
-            <p class="hero-copy">Looks like customer view, with edit mode to add, remove, and update items.</p>
+            <p class="hero-copy">Looks like customer view with optional edit mode for restaurant owners.</p>
         </section>
 
         <section class="list-panel">
@@ -25,7 +25,6 @@
                 <button id="editModeButton" class="primary-link" type="button">Edit Menu</button>
                 <div id="editActions" class="menu-editor-action-row" hidden>
                     <button id="openAddOverlayButton" class="refresh-button" type="button">Add</button>
-                    <button id="openRemoveOverlayButton" class="refresh-button menu-remove-action" type="button">Remove</button>
                 </div>
             </div>
 
@@ -54,40 +53,27 @@
         </div>
     </section>
 
-    <section id="removeItemsOverlay" class="menu-editor-overlay" hidden>
-        <div class="menu-editor-overlay-card menu-editor-overlay-card-large">
-            <div class="menu-editor-overlay-header">
-                <h2>Remove menu items</h2>
-                <button type="button" class="menu-editor-close" data-close-overlay="removeItemsOverlay">✕</button>
-            </div>
-            <div id="removeSelectionList" class="menu-remove-list"></div>
-            <div class="menu-editor-overlay-footer-fixed">
-                <button id="confirmRemoveButton" class="menu-remove-submit" type="button">Remove selected</button>
-            </div>
-        </div>
-    </section>
-
-    <section id="editItemOverlay" class="menu-editor-overlay" hidden>
+    <section id="itemDetailsOverlay" class="menu-editor-overlay" hidden>
         <div class="menu-editor-overlay-card">
             <div class="menu-editor-overlay-header">
-                <h2>Menu item details</h2>
-                <button type="button" class="menu-editor-close" data-close-overlay="editItemOverlay">✕</button>
+                <h2 id="itemOverlayHeading">Menu item details</h2>
+                <button type="button" class="menu-editor-close" data-close-overlay="itemDetailsOverlay">✕</button>
             </div>
-            <form id="editItemForm" class="menu-editor-form">
-                <label>Item name<input id="editItemName" type="text" required disabled></label>
-                <label>Category<input id="editItemCategory" type="text" disabled></label>
-                <label>Description<textarea id="editItemDescription" rows="3" disabled></textarea></label>
-                <label>Image URL<input id="editItemImage" type="text" disabled></label>
-                <label>Price ($)<input id="editItemPrice" type="number" step="0.01" required disabled></label>
+            <form id="itemDetailsForm" class="menu-editor-form">
+                <label>Item name<input id="detailItemName" type="text" required disabled></label>
+                <label>Category<input id="detailItemCategory" type="text" disabled></label>
+                <label>Description<textarea id="detailItemDescription" rows="3" disabled></textarea></label>
+                <label>Image URL<input id="detailItemImage" type="text" disabled></label>
+                <label>Price ($)<input id="detailItemPrice" type="number" step="0.01" required disabled></label>
                 <div class="menu-editor-overlay-actions">
-                    <button id="editItemToggleButton" class="refresh-button" type="button">Edit</button>
-                    <button id="saveItemChangesButton" class="primary-link" type="submit" hidden>Save changes</button>
+                    <button id="removeItemButton" class="menu-remove-submit" type="button" hidden>Remove item</button>
+                    <button id="saveItemButton" class="primary-link" type="submit" hidden>Save changes</button>
                 </div>
             </form>
         </div>
     </section>
 
-    <script src="features/add-menu-items.js"></script>
+    <script src="features/menu-editor.js"></script>
     <script src="features/cart-overlay.js"></script>
 </body>
 </html>

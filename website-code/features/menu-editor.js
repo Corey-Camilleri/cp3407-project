@@ -7,19 +7,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const editModeButton = document.getElementById('editModeButton');
     const editActions = document.getElementById('editActions');
     const openAddOverlayButton = document.getElementById('openAddOverlayButton');
-    const openRemoveOverlayButton = document.getElementById('openRemoveOverlayButton');
     const addItemOverlay = document.getElementById('addItemOverlay');
-    const removeItemsOverlay = document.getElementById('removeItemsOverlay');
-    const editItemOverlay = document.getElementById('editItemOverlay');
+    const itemDetailsOverlay = document.getElementById('itemDetailsOverlay');
     const editorBackdrop = document.getElementById('editorBackdrop');
     const addItemForm = document.getElementById('addItemForm');
-    const removeSelectionList = document.getElementById('removeSelectionList');
-    const confirmRemoveButton = document.getElementById('confirmRemoveButton');
-    const editItemForm = document.getElementById('editItemForm');
-    const editItemToggleButton = document.getElementById('editItemToggleButton');
-    const saveItemChangesButton = document.getElementById('saveItemChangesButton');
-    const restaurantId = new URLSearchParams(window.location.search).get('restaurantId');
-    const storageKey = `menuEditorItems:${restaurantId || 'all'}`;
+    const itemDetailsForm = document.getElementById('itemDetailsForm');
+    const removeItemButton = document.getElementById('removeItemButton');
+    const saveItemButton = document.getElementById('saveItemButton');
+    const itemOverlayHeading = document.getElementById('itemOverlayHeading');
 
     const addItemName = document.getElementById('addItemName');
     const addItemCategory = document.getElementById('addItemCategory');
@@ -27,11 +22,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const addItemImage = document.getElementById('addItemImage');
     const addItemPrice = document.getElementById('addItemPrice');
 
-    const editItemName = document.getElementById('editItemName');
-    const editItemCategory = document.getElementById('editItemCategory');
-    const editItemDescription = document.getElementById('editItemDescription');
-    const editItemImage = document.getElementById('editItemImage');
-    const editItemPrice = document.getElementById('editItemPrice');
+    const detailItemName = document.getElementById('detailItemName');
+    const detailItemCategory = document.getElementById('detailItemCategory');
+    const detailItemDescription = document.getElementById('detailItemDescription');
+    const detailItemImage = document.getElementById('detailItemImage');
+    const detailItemPrice = document.getElementById('detailItemPrice');
+
+    const restaurantId = new URLSearchParams(window.location.search).get('restaurantId');
 
     const categoryRules = [
         { key: 'deals', label: 'Deals', pattern: /deal|combo|bundle|special/i },
@@ -46,23 +43,20 @@ document.addEventListener('DOMContentLoaded', () => {
         { key: 'desserts', label: 'Desserts', pattern: /dessert|cake|cookie|ice cream|tiramisu|brownie/i }
     ];
 
-    let menuItems = [];
-    let editMode = false;
-    let selectedRemoveIds = new Set();
-    let selectedEditItemId = null;
-    let editDetailsMode = false;
-
-    function saveMenuToStorage() {
-        localStorage.setItem(storageKey, JSON.stringify(menuItems));
+    if (!menuContainer || !categoryTabs || !editorStatus) {
+        return;
     }
 
-    function loadMenuFromStorage() {
-        try {
-            const raw = localStorage.getItem(storageKey);
-            return raw ? JSON.parse(raw) : null;
-        } catch (error) {
-            return null;
-        }
+    let menuItems = [];
+    let editMode = false;
+    let selectedItemId = null;
+
+    function getStorageKey() {
+        return `menuEditorItems:${restaurantId || 'missing-restaurant'}`;
+    }
+
+    function setEditorStatus(text) {
+        editorStatus.textContent = text;
     }
 
     function formatPrice(value) {
@@ -85,10 +79,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         overlay.hidden = true;
-
-        const stillOpen = [addItemOverlay, removeItemsOverlay, editItemOverlay]
-            .some((element) => element && !element.hidden);
-
+        const stillOpen = [addItemOverlay, itemDetailsOverlay].some((entry) => entry && !entry.hidden);
         if (!stillOpen && editorBackdrop) {
             editorBackdrop.hidden = true;
         }
@@ -96,30 +87,40 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function closeAllOverlays() {
         closeOverlay(addItemOverlay);
-        closeOverlay(removeItemsOverlay);
-        closeOverlay(editItemOverlay);
+        closeOverlay(itemDetailsOverlay);
     }
 
-    function setEditorStatus(text) {
-        if (editorStatus) {
-            editorStatus.textContent = text;
-        }
-    }
-
-    function setEditDetailsEnabled(isEnabled) {
-        editDetailsMode = isEnabled;
-        [editItemName, editItemCategory, editItemDescription, editItemImage, editItemPrice]
-            .forEach((input) => {
-                if (input) {
-                    input.disabled = !isEnabled;
+    function setItemDetailsEditable(enabled) {
+        [detailItemName, detailItemCategory, detailItemDescription, detailItemImage, detailItemPrice]
+            .forEach((element) => {
+                if (element) {
+                    element.disabled = !enabled;
                 }
             });
 
-        if (saveItemChangesButton) {
-            saveItemChangesButton.hidden = !isEnabled;
+        if (saveItemButton) {
+            saveItemButton.hidden = !enabled;
         }
-        if (editItemToggleButton) {
-            editItemToggleButton.textContent = isEnabled ? 'Cancel edit' : 'Edit';
+
+        if (removeItemButton) {
+            removeItemButton.hidden = !enabled;
+        }
+
+        if (itemOverlayHeading) {
+            itemOverlayHeading.textContent = enabled ? 'Edit menu item' : 'Menu item details';
+        }
+    }
+
+    function saveMenuToStorage() {
+        localStorage.setItem(getStorageKey(), JSON.stringify(menuItems));
+    }
+
+    function loadMenuFromStorage() {
+        try {
+            const raw = localStorage.getItem(getStorageKey());
+            return raw ? JSON.parse(raw) : null;
+        } catch (error) {
+            return null;
         }
     }
 
@@ -131,8 +132,7 @@ document.addEventListener('DOMContentLoaded', () => {
         grouped.other = [];
 
         items.forEach((item) => {
-            const categoryText = item?.category || '';
-            const haystack = `${item?.name || ''} ${item?.description || ''} ${categoryText}`;
+            const haystack = `${item?.name || ''} ${item?.description || ''} ${item?.category || ''}`;
             const matchedCategory = categoryRules.find((category) => category.pattern.test(haystack));
             const key = matchedCategory ? matchedCategory.key : 'other';
             grouped[key].push(item);
@@ -141,50 +141,7 @@ document.addEventListener('DOMContentLoaded', () => {
         return grouped;
     }
 
-    function renderRemoveList() {
-        if (!removeSelectionList) {
-            return;
-        }
-
-        removeSelectionList.innerHTML = '';
-
-        if (!menuItems.length) {
-            const empty = document.createElement('p');
-            empty.className = 'status-message';
-            empty.textContent = 'No items available to remove.';
-            removeSelectionList.appendChild(empty);
-            return;
-        }
-
-        menuItems.forEach((item) => {
-            const row = document.createElement('button');
-            row.type = 'button';
-            row.className = 'menu-remove-row';
-            row.dataset.itemId = String(item.id);
-            row.innerHTML = `<strong>${item.name}</strong><span>$${formatPrice(item.price)}</span>`;
-
-            if (selectedRemoveIds.has(item.id)) {
-                row.classList.add('is-selected');
-            }
-
-            row.addEventListener('click', () => {
-                if (selectedRemoveIds.has(item.id)) {
-                    selectedRemoveIds.delete(item.id);
-                } else {
-                    selectedRemoveIds.add(item.id);
-                }
-                renderRemoveList();
-            });
-
-            removeSelectionList.appendChild(row);
-        });
-    }
-
     function renderMenu() {
-        if (!menuContainer || !categoryTabs) {
-            return;
-        }
-
         menuContainer.innerHTML = '';
         categoryTabs.innerHTML = '';
 
@@ -193,7 +150,6 @@ document.addEventListener('DOMContentLoaded', () => {
             msg.className = 'status-message';
             msg.textContent = 'No menu items available yet.';
             menuContainer.appendChild(msg);
-            setEditorStatus(editMode ? 'Edit mode is on.' : 'Edit mode is off.');
             return;
         }
 
@@ -256,18 +212,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 card.appendChild(details);
 
                 card.addEventListener('click', () => {
-                    if (!editMode) {
-                        return;
-                    }
+                    selectedItemId = item.id;
+                    detailItemName.value = item.name || '';
+                    detailItemCategory.value = item.category || '';
+                    detailItemDescription.value = item.description || '';
+                    detailItemImage.value = item.imageUrl || '';
+                    detailItemPrice.value = formatPrice(item.price);
 
-                    selectedEditItemId = item.id;
-                    editItemName.value = item.name || '';
-                    editItemCategory.value = item.category || '';
-                    editItemDescription.value = item.description || '';
-                    editItemImage.value = item.imageUrl || '';
-                    editItemPrice.value = Number(item.price || 0).toFixed(2);
-                    setEditDetailsEnabled(false);
-                    openOverlay(editItemOverlay);
+                    setItemDetailsEditable(editMode);
+                    openOverlay(itemDetailsOverlay);
                 });
 
                 grid.appendChild(card);
@@ -292,12 +245,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 section.scrollIntoView({ behavior: 'smooth', block: 'start' });
             });
         });
-
-        if (editMode) {
-            setEditorStatus('Edit mode is on. Click an item card to edit details.');
-        } else {
-            setEditorStatus('Edit mode is off. Click Edit Menu to manage items.');
-        }
     }
 
     function renderRestaurantProfile(restaurant) {
@@ -339,13 +286,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function loadRestaurantProfile() {
         if (!restaurantId) {
+            setEditorStatus('Missing restaurantId in URL. Open editor from restaurant dashboard.');
             return;
         }
 
         try {
             const response = await fetch('/api/restaurants');
             if (!response.ok) {
-                return;
+                throw new Error('Unable to load restaurant profile.');
             }
 
             const restaurants = await response.json();
@@ -353,26 +301,34 @@ document.addEventListener('DOMContentLoaded', () => {
                 ? restaurants.find((restaurant) => Number(restaurant.id) === Number(restaurantId))
                 : null;
 
-            renderRestaurantProfile(match || null);
+            if (!match) {
+                setEditorStatus('Restaurant not found for this editor session.');
+                return;
+            }
+
+            renderRestaurantProfile(match);
         } catch (error) {
-            renderRestaurantProfile(null);
+            setEditorStatus(error.message);
         }
     }
 
     async function loadMenuFromApi() {
+        if (!restaurantId) {
+            menuItems = [];
+            renderMenu();
+            return;
+        }
+
         const localMenu = loadMenuFromStorage();
 
-        if (Array.isArray(localMenu) && localMenu.length > 0) {
+        if (Array.isArray(localMenu)) {
             menuItems = localMenu;
             renderMenu();
             return;
         }
 
         try {
-            const endpoint = restaurantId
-                ? `/api/menu-items?restaurantId=${encodeURIComponent(restaurantId)}`
-                : '/api/menu-items';
-            const response = await fetch(endpoint);
+            const response = await fetch(`/api/menu-items?restaurantId=${encodeURIComponent(restaurantId)}`);
 
             if (!response.ok) {
                 throw new Error('Failed to load menu items.');
@@ -385,7 +341,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 description: item.description || '',
                 imageUrl: item.imageUrl || '',
                 price: Number(item.price || 0),
-                restaurantId: Number(item.restaurantId || restaurantId || 0),
+                restaurantId: Number(item.restaurantId || restaurantId),
                 category: ''
             }));
 
@@ -412,21 +368,14 @@ document.addEventListener('DOMContentLoaded', () => {
             editMode = !editMode;
             editActions.hidden = !editMode;
             editModeButton.textContent = editMode ? 'Exit Edit Mode' : 'Edit Menu';
-            renderMenu();
+            setEditorStatus(editMode ? 'Edit mode is on. Open an item to edit or remove.' : 'Edit mode is off. Item overlay shows customer-style details.');
+            closeOverlay(itemDetailsOverlay);
         });
     }
 
     if (openAddOverlayButton) {
         openAddOverlayButton.addEventListener('click', () => {
             openOverlay(addItemOverlay);
-        });
-    }
-
-    if (openRemoveOverlayButton) {
-        openRemoveOverlayButton.addEventListener('click', () => {
-            selectedRemoveIds = new Set();
-            renderRemoveList();
-            openOverlay(removeItemsOverlay);
         });
     }
 
@@ -463,7 +412,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             const nextId = menuItems.reduce((max, item) => Math.max(max, Number(item.id || 0)), 0) + 1;
-
             menuItems.push({
                 id: nextId,
                 name,
@@ -471,7 +419,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 description,
                 imageUrl,
                 price,
-                restaurantId: Number(restaurantId || 0)
+                restaurantId: Number(restaurantId)
             });
 
             saveMenuToStorage();
@@ -481,55 +429,48 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    if (confirmRemoveButton) {
-        confirmRemoveButton.addEventListener('click', () => {
-            if (!selectedRemoveIds.size) {
+    if (removeItemButton) {
+        removeItemButton.addEventListener('click', () => {
+            if (!editMode || selectedItemId === null) {
                 return;
             }
 
-            menuItems = menuItems.filter((item) => !selectedRemoveIds.has(item.id));
-            selectedRemoveIds = new Set();
+            menuItems = menuItems.filter((item) => Number(item.id) !== Number(selectedItemId));
             saveMenuToStorage();
             renderMenu();
-            closeOverlay(removeItemsOverlay);
+            closeOverlay(itemDetailsOverlay);
         });
     }
 
-    if (editItemToggleButton) {
-        editItemToggleButton.addEventListener('click', () => {
-            setEditDetailsEnabled(!editDetailsMode);
-        });
-    }
-
-    if (editItemForm) {
-        editItemForm.addEventListener('submit', (event) => {
+    if (itemDetailsForm) {
+        itemDetailsForm.addEventListener('submit', (event) => {
             event.preventDefault();
 
-            if (!editDetailsMode || selectedEditItemId === null) {
+            if (!editMode || selectedItemId === null) {
                 return;
             }
 
-            const idx = menuItems.findIndex((item) => Number(item.id) === Number(selectedEditItemId));
-            if (idx === -1) {
+            const index = menuItems.findIndex((item) => Number(item.id) === Number(selectedItemId));
+            if (index === -1) {
                 return;
             }
 
-            menuItems[idx] = {
-                ...menuItems[idx],
-                name: editItemName.value.trim(),
-                category: editItemCategory.value.trim(),
-                description: editItemDescription.value.trim(),
-                imageUrl: editItemImage.value.trim(),
-                price: Number(editItemPrice.value || 0)
+            menuItems[index] = {
+                ...menuItems[index],
+                name: detailItemName.value.trim(),
+                category: detailItemCategory.value.trim(),
+                description: detailItemDescription.value.trim(),
+                imageUrl: detailItemImage.value.trim(),
+                price: Number(detailItemPrice.value || 0)
             };
 
             saveMenuToStorage();
-            setEditDetailsEnabled(false);
             renderMenu();
-            closeOverlay(editItemOverlay);
+            closeOverlay(itemDetailsOverlay);
         });
     }
 
+    setEditorStatus('Loading menu...');
     loadRestaurantProfile();
     loadMenuFromApi();
 });

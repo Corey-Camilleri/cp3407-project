@@ -1,6 +1,7 @@
 const restaurantSelector = document.getElementById('restaurantSelector');
 const restaurantStatus = document.getElementById('restaurantStatus');
 const restaurantMenuDisplay = document.getElementById('restaurantMenuDisplay');
+const menuEditorLink = document.getElementById('menuEditorLink');
 
 const profileName = document.getElementById('profileName');
 const profileDescription = document.getElementById('profileDescription');
@@ -118,6 +119,10 @@ function renderSelectedRestaurant(restaurantId) {
   const restaurant = restaurants.find((entry) => String(entry.id) === String(restaurantId));
   if (!restaurant) {
     return;
+  }
+
+  if (menuEditorLink) {
+    menuEditorLink.href = `menu-editor.html?restaurantId=${encodeURIComponent(restaurant.id)}`;
   }
 
   const menuItems = getMenuDisplayItems(String(restaurant.id));
