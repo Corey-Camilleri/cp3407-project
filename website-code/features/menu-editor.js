@@ -8,6 +8,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const editActions = document.getElementById('editActions');
     const openAddOverlayButton = document.getElementById('openAddOverlayButton');
     const openDiscountOverlayButton = document.getElementById('openDiscountOverlayButton');
+    const openBundleOverlayButton = document.getElementById('openBundleOverlayButton');
     const addItemOverlay = document.getElementById('addItemOverlay');
     const itemDetailsOverlay = document.getElementById('itemDetailsOverlay');
     const discountOverlay = document.getElementById('discountOverlay');
@@ -40,7 +41,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const discountPercentInput = document.getElementById('discountPercent');
     const discountBundlePriceInput = document.getElementById('discountBundlePrice');
     const discountList = document.getElementById('discountList');
+    const discountBuilderHeading = document.getElementById('discountBuilderHeading');
 
+    const discountTypeGroup = document.getElementById('discountTypeGroup');
     const discountItemGroup = document.getElementById('discountItemGroup');
     const discountCategoryGroup = document.getElementById('discountCategoryGroup');
     const discountBundleGroup = document.getElementById('discountBundleGroup');
@@ -70,6 +73,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let discounts = [];
     let editMode = false;
     let selectedItemId = null;
+    let discountOverlayMode = 'discount';
 
     function getStorageKey() {
         return `menuEditorItems:${restaurantId || 'missing-restaurant'}`;
@@ -229,7 +233,11 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        const type = discountTypeSelect.value;
+        const type = discountOverlayMode === 'bundle' ? 'bundle' : discountTypeSelect.value;
+
+        if (discountTypeGroup) {
+            discountTypeGroup.hidden = discountOverlayMode === 'bundle';
+        }
 
         if (discountItemGroup) {
             discountItemGroup.hidden = type !== 'item';
@@ -250,6 +258,27 @@ document.addEventListener('DOMContentLoaded', () => {
         if (discountBundlePriceGroup) {
             discountBundlePriceGroup.hidden = type !== 'bundle';
         }
+
+        if (discountBuilderHeading) {
+            discountBuilderHeading.textContent = discountOverlayMode === 'bundle' ? 'Bundle builder' : 'Discount builder';
+        }
+    }
+
+    function openDiscountBuilder(mode) {
+        discountOverlayMode = mode === 'bundle' ? 'bundle' : 'discount';
+
+        if (discountTypeSelect) {
+            if (discountOverlayMode === 'bundle') {
+                discountTypeSelect.value = 'bundle';
+            } else if (discountTypeSelect.value === 'bundle') {
+                discountTypeSelect.value = 'item';
+            }
+        }
+
+        populateDiscountSelectors();
+        updateDiscountTypeUI();
+        renderDiscountList();
+        openOverlay(discountOverlay);
     }
 
     function renderDiscountList() {
@@ -546,10 +575,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (openDiscountOverlayButton) {
         openDiscountOverlayButton.addEventListener('click', () => {
-            populateDiscountSelectors();
-            updateDiscountTypeUI();
-            renderDiscountList();
-            openOverlay(discountOverlay);
+            openDiscountBuilder('discount');
+        });
+    }
+
+    if (openBundleOverlayButton) {
+        openBundleOverlayButton.addEventListener('click', () => {
+            openDiscountBuilder('bundle');
         });
     }
 
@@ -673,7 +705,9 @@ document.addEventListener('DOMContentLoaded', () => {
             event.preventDefault();
 
             const name = discountNameInput ? discountNameInput.value.trim() : '';
-            const type = discountTypeSelect ? discountTypeSelect.value : 'item';
+            const type = discountOverlayMode === 'bundle'
+                ? 'bundle'
+                : (discountTypeSelect ? discountTypeSelect.value : 'item');
             const percent = Number(discountPercentInput ? discountPercentInput.value : 0);
             const bundlePrice = Number(discountBundlePriceInput ? discountBundlePriceInput.value : 0);
             const alternatives = getSelectedValues(discountAlternativesSelect);

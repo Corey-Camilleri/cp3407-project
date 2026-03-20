@@ -25,7 +25,8 @@
                 <button id="editModeButton" class="primary-link" type="button">Edit Menu</button>
                 <div id="editActions" class="menu-editor-action-row" hidden>
                     <button id="openAddOverlayButton" class="refresh-button" type="button">Add</button>
-                    <button id="openDiscountOverlayButton" class="refresh-button" type="button">Discounts</button>
+                    <button id="openDiscountOverlayButton" class="refresh-button" type="button">Discount</button>
+                    <button id="openBundleOverlayButton" class="refresh-button" type="button">Bundle</button>
                 </div>
             </div>
 
@@ -77,20 +78,21 @@
     <section id="discountOverlay" class="menu-editor-overlay" hidden>
         <div class="menu-editor-overlay-card menu-editor-overlay-card-large">
             <div class="menu-editor-overlay-header">
-                <h2>Discount builder</h2>
+                <h2 id="discountBuilderHeading">Discount builder</h2>
                 <button type="button" class="menu-editor-close" data-close-overlay="discountOverlay">✕</button>
             </div>
 
             <form id="discountForm" class="menu-editor-form">
                 <label>Discount name<input id="discountName" type="text" required></label>
 
-                <label>Discount applies to
-                    <select id="discountType" required>
-                        <option value="item">Single item</option>
-                        <option value="category">Category</option>
-                        <option value="bundle">Bundle</option>
-                    </select>
-                </label>
+                <div id="discountTypeGroup" class="discount-config-group">
+                    <label>Discount applies to
+                        <select id="discountType" required>
+                            <option value="item">Single item</option>
+                            <option value="category">Category</option>
+                        </select>
+                    </label>
+                </div>
 
                 <div id="discountItemGroup" class="discount-config-group">
                     <label>Item
