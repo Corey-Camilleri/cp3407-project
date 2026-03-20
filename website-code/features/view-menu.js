@@ -110,7 +110,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             items.forEach((item, itemIndex) => {
                 const card = document.createElement('article');
-                card.className = 'menu-item-card';
+                card.className = 'menu-item-card menu-item-card-clickable';
 
                 const image = document.createElement('img');
                 image.className = 'menu-item-image';
@@ -136,6 +136,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 details.appendChild(price);
 
                 card.appendChild(details);
+
+                card.addEventListener('click', () => {
+                    if (window.CustomerMenuItemOverlay && typeof window.CustomerMenuItemOverlay.open === 'function') {
+                        window.CustomerMenuItemOverlay.open(item);
+                    }
+                });
+
                 grid.appendChild(card);
             });
 

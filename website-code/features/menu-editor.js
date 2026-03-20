@@ -212,6 +212,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 card.appendChild(details);
 
                 card.addEventListener('click', () => {
+                    if (!editMode) {
+                        if (window.CustomerMenuItemOverlay && typeof window.CustomerMenuItemOverlay.open === 'function') {
+                            window.CustomerMenuItemOverlay.open(item);
+                        }
+                        return;
+                    }
+
                     selectedItemId = item.id;
                     detailItemName.value = item.name || '';
                     detailItemCategory.value = item.category || '';
