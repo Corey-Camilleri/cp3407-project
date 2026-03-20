@@ -7,7 +7,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const openingHoursBackdrop = document.getElementById('openingHoursBackdrop');
     const openingHoursOverlay = document.getElementById('openingHoursOverlay');
     const openingHoursEditorList = document.getElementById('openingHoursEditorList');
-    const openingHoursEditSaveButton = document.getElementById('openingHoursEditSaveButton');
+    const openingHoursSaveButton = document.getElementById('openingHoursSaveButton');
+    const openingHoursCancelButton = document.getElementById('openingHoursCancelButton');
 
     const dayOrder = {
         Monday: 1,
@@ -20,12 +21,13 @@ document.addEventListener('DOMContentLoaded', () => {
     };
     const orderedDays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
-    if (!restaurantSelector || !openingHoursStatus || !openingHoursList || !openingHoursOverlay || !openingHoursBackdrop || !openingHoursEditorList || !openingHoursEditSaveButton) {
+    if (!restaurantSelector || !openingHoursStatus || !openingHoursList || !openingHoursOverlay || !openingHoursBackdrop || !openingHoursEditorList || !openingHoursSaveButton || !openingHoursCancelButton) {
         return;
     }
 
-    let editMode = false;
     let editorHours = [];
+    let baselineEditorHours = [];
+    let selectedDayIndex = -1;
 
     function getRestaurantId() {
         return restaurantSelector.value ? String(restaurantSelector.value) : '';
@@ -136,15 +138,17 @@ document.addEventListener('DOMContentLoaded', () => {
                     endDay: item.day,
                     open: item.open,
                     close: item.close,
+                    closed: Boolean(item.closed),
                     lastIndex: currentIndex
                 });
                 return;
             }
 
-            const isSameHours = last.open === item.open && last.close === item.close;
+            const isSameState = Boolean(last.closed) === Boolean(item.closed);
+            const isSameHours = item.closed ? true : (last.open === item.open && last.close === item.close);
             const isConsecutiveDay = currentIndex === last.lastIndex + 1;
 
-            if (isSameHours && isConsecutiveDay) {
+            if (isSameState && isSameHours && isConsecutiveDay) {
                 last.endDay = item.day;
                 last.lastIndex = currentIndex;
                 return;
@@ -155,6 +159,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 endDay: item.day,
                 open: item.open,
                 close: item.close,
+                closed: Boolean(item.closed),
                 lastIndex: currentIndex
             });
         });
@@ -172,13 +177,33 @@ document.addEventListener('DOMContentLoaded', () => {
         openingHoursOverlay.hidden = true;
         openingHoursBackdrop.hidden = true;
         openingHoursOverlay.setAttribute('aria-hidden', 'true');
-        editMode = false;
-        openingHoursEditSaveButton.textContent = 'Edit';
+        selectedDayIndex = -1;
+        openingHoursSaveButton.hidden = true;
+        openingHoursCancelButton.hidden = true;
+    }
+
+    function getHoursSignature(hours) {
+        return JSON.stringify(hours.map((item) => ({
+            day: item.day,
+            open: item.open,
+            close: item.close,
+            closed: item.closed
+        })));
+    }
+
+    function hasUnsavedChanges() {
+        return getHoursSignature(editorHours) !== getHoursSignature(baselineEditorHours);
+    }
+
+    function updateFooterButtons() {
+        const dirty = hasUnsavedChanges();
+        openingHoursSaveButton.hidden = !dirty;
+        openingHoursCancelButton.hidden = !dirty;
     }
 
     async function renderPublicHours() {
         const restaurantId = getRestaurantId();
-        const hours = sortHours(await readHours(restaurantId));
+        const hours = normalizeEditorHours(sortHours(await readHours(restaurantId)));
         const groupedHours = groupConsecutiveHours(hours);
 
         openingHoursList.innerHTML = '';
@@ -198,11 +223,14 @@ document.addEventListener('DOMContentLoaded', () => {
         groupedHours.forEach((item) => {
             const row = document.createElement('article');
             row.className = 'menu-display-item';
+            if (item.closed) {
+                row.classList.add('is-closed');
+            }
             const dayLabel = item.startDay === item.endDay ? item.startDay : `${item.startDay} - ${item.endDay}`;
             row.innerHTML = `
                 <div>
                     <h3>${dayLabel}</h3>
-                    <p>${item.open} - ${item.close}</p>
+                    <p>${item.closed ? '<span class="closed-day-text">Closed</span>' : `${item.open} - ${item.close}`}</p>
                 </div>
             `;
             openingHoursList.appendChild(row);
@@ -215,6 +243,14 @@ document.addEventListener('DOMContentLoaded', () => {
         editorHours.forEach((item, index) => {
             const row = document.createElement('article');
             row.className = 'menu-display-item';
+            if (selectedDayIndex === index) {
+                row.classList.add('is-selected');
+            }
+
+            row.addEventListener('click', async () => {
+                selectedDayIndex = index;
+                await renderEditorHours();
+            });
 
             const details = document.createElement('div');
             const dayTitle = document.createElement('h3');
@@ -226,9 +262,14 @@ document.addEventListener('DOMContentLoaded', () => {
             const openInput = document.createElement('input');
             openInput.type = 'time';
             openInput.value = item.open;
-            openInput.disabled = !editMode || item.closed;
-            openInput.addEventListener('change', (event) => {
+            openInput.disabled = selectedDayIndex !== index || item.closed;
+            openInput.addEventListener('click', (event) => {
+                event.stopPropagation();
+            });
+            openInput.addEventListener('change', async (event) => {
                 editorHours[index].open = event.target.value;
+                updateFooterButtons();
+                await renderEditorHours();
             });
 
             const separator = document.createElement('span');
@@ -237,9 +278,14 @@ document.addEventListener('DOMContentLoaded', () => {
             const closeInput = document.createElement('input');
             closeInput.type = 'time';
             closeInput.value = item.close;
-            closeInput.disabled = !editMode || item.closed;
-            closeInput.addEventListener('change', (event) => {
+            closeInput.disabled = selectedDayIndex !== index || item.closed;
+            closeInput.addEventListener('click', (event) => {
+                event.stopPropagation();
+            });
+            closeInput.addEventListener('change', async (event) => {
                 editorHours[index].close = event.target.value;
+                updateFooterButtons();
+                await renderEditorHours();
             });
 
             const closedText = document.createElement('p');
@@ -259,15 +305,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const closedToggleButton = document.createElement('button');
             closedToggleButton.type = 'button';
-            closedToggleButton.className = 'menu-remove-submit';
-            closedToggleButton.textContent = item.closed ? 'Cancel' : 'Closed';
-            closedToggleButton.disabled = !editMode;
+            closedToggleButton.className = 'opening-hours-status-toggle';
+            closedToggleButton.textContent = item.closed ? 'Closed' : 'Open';
             closedToggleButton.addEventListener('click', async () => {
-                if (!editMode) {
-                    return;
-                }
-
+                selectedDayIndex = index;
                 editorHours[index].closed = !editorHours[index].closed;
+                updateFooterButtons();
                 await renderEditorHours();
             });
 
@@ -276,6 +319,8 @@ document.addEventListener('DOMContentLoaded', () => {
             row.appendChild(actions);
             openingHoursEditorList.appendChild(row);
         });
+
+        updateFooterButtons();
     }
 
     async function renderAllHours() {
@@ -291,8 +336,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const currentHours = sortHours(await readHours(getRestaurantId()));
         editorHours = normalizeEditorHours(currentHours);
-        editMode = false;
-        openingHoursEditSaveButton.textContent = 'Edit';
+        baselineEditorHours = normalizeEditorHours(currentHours);
+        selectedDayIndex = -1;
+        updateFooterButtons();
         await renderEditorHours();
         openOverlay();
     });
@@ -318,16 +364,9 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    openingHoursEditSaveButton.addEventListener('click', async () => {
+    openingHoursSaveButton.addEventListener('click', async () => {
         const restaurantId = getRestaurantId();
         if (!restaurantId) {
-            return;
-        }
-
-        if (!editMode) {
-            editMode = true;
-            openingHoursEditSaveButton.textContent = 'Save';
-            await renderEditorHours();
             return;
         }
 
@@ -344,14 +383,20 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
 
-            editMode = false;
-            openingHoursEditSaveButton.textContent = 'Edit';
+            baselineEditorHours = editorHours.map((item) => ({ ...item }));
             await renderAllHours();
             await renderEditorHours();
             openingHoursStatus.textContent = 'Opening hours updated.';
         } catch (error) {
             openingHoursStatus.textContent = error.message;
         }
+    });
+
+    openingHoursCancelButton.addEventListener('click', async () => {
+        editorHours = baselineEditorHours.map((item) => ({ ...item }));
+        selectedDayIndex = -1;
+        updateFooterButtons();
+        await renderEditorHours();
     });
 
     restaurantSelector.addEventListener('change', async () => {
