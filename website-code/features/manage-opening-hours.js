@@ -23,6 +23,7 @@ document.addEventListener('DOMContentLoaded', () => {
         Saturday: 6,
         Sunday: 7
     };
+    const orderedDays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
     if (!restaurantSelector || !openingHoursStatus || !openingHoursList || !openingHoursOverlay || !openingHoursBackdrop || !openingHoursForm || !openingHoursEditorList || !hoursDay || !hoursOpenTime || !hoursCloseTime) {
         return;
@@ -97,6 +98,49 @@ document.addEventListener('DOMContentLoaded', () => {
         return `${item.day}: ${item.open} - ${item.close}`;
     }
 
+    function groupConsecutiveHours(hours) {
+        if (!hours.length) {
+            return [];
+        }
+
+        const grouped = [];
+
+        hours.forEach((item) => {
+            const currentIndex = orderedDays.indexOf(item.day);
+            const last = grouped[grouped.length - 1];
+
+            if (!last) {
+                grouped.push({
+                    startDay: item.day,
+                    endDay: item.day,
+                    open: item.open,
+                    close: item.close,
+                    lastIndex: currentIndex
+                });
+                return;
+            }
+
+            const isSameHours = last.open === item.open && last.close === item.close;
+            const isConsecutiveDay = currentIndex === last.lastIndex + 1;
+
+            if (isSameHours && isConsecutiveDay) {
+                last.endDay = item.day;
+                last.lastIndex = currentIndex;
+                return;
+            }
+
+            grouped.push({
+                startDay: item.day,
+                endDay: item.day,
+                open: item.open,
+                close: item.close,
+                lastIndex: currentIndex
+            });
+        });
+
+        return grouped;
+    }
+
     function openOverlay() {
         openingHoursBackdrop.hidden = false;
         openingHoursOverlay.hidden = false;
@@ -112,6 +156,7 @@ document.addEventListener('DOMContentLoaded', () => {
     async function renderPublicHours() {
         const restaurantId = getRestaurantId();
         const hours = sortHours(await readHours(restaurantId));
+        const groupedHours = groupConsecutiveHours(hours);
 
         openingHoursList.innerHTML = '';
 
@@ -122,17 +167,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
         openingHoursStatus.textContent = 'Availability hours for selected restaurant.';
 
-        if (!hours.length) {
+        if (!groupedHours.length) {
             openingHoursList.innerHTML = '<p class="status-message">No opening hours set.</p>';
             return;
         }
 
-        hours.forEach((item) => {
+        groupedHours.forEach((item) => {
             const row = document.createElement('article');
             row.className = 'menu-display-item';
+            const dayLabel = item.startDay === item.endDay ? item.startDay : `${item.startDay} - ${item.endDay}`;
             row.innerHTML = `
                 <div>
-                    <h3>${item.day}</h3>
+                    <h3>${dayLabel}</h3>
                     <p>${item.open} - ${item.close}</p>
                 </div>
             `;
