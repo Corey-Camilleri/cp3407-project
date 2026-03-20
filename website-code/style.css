@@ -420,6 +420,34 @@ h3 {
 	border: 1px solid rgba(75, 95, 78, 0.18);
 	font: inherit;
 	background: #fff;
+
+.discount-config-group {
+	display: grid;
+	gap: 8px;
+}
+
+.discount-item-checklist {
+	display: grid;
+	gap: 8px;
+	max-height: 180px;
+	overflow: auto;
+	padding: 8px;
+	border: 1px solid rgba(75, 95, 78, 0.2);
+	border-radius: 10px;
+	background: #fff;
+}
+
+.discount-check-row {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	font-weight: 700;
+	color: var(--ink);
+}
+
+#discountAlternatives {
+	min-height: 120px;
+}
 }
 
 .restaurant-info-strip {
