@@ -66,6 +66,11 @@
         });
 
         panel.addEventListener('click', (event) => {
+            if (event.target === panel) {
+                close();
+                return;
+            }
+
             event.stopPropagation();
         });
 

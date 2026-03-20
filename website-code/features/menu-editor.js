@@ -392,6 +392,21 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    [addItemOverlay, itemDetailsOverlay].forEach((overlay) => {
+        if (!overlay) {
+            return;
+        }
+
+        overlay.addEventListener('click', (event) => {
+            if (event.target === overlay) {
+                closeOverlay(overlay);
+                return;
+            }
+
+            event.stopPropagation();
+        });
+    });
+
     document.querySelectorAll('[data-close-overlay]').forEach((button) => {
         button.addEventListener('click', (event) => {
             event.preventDefault();
