@@ -288,23 +288,25 @@ function buildValue(column, rowIndex, tableIndex) {
 }
 
 async function generate() {
+  const schemaName = process.env.DB_NAME || 'cp3407';
+
   const connection = await mysql.createConnection({
     host: process.env.DB_HOST || 'localhost',
     user: process.env.DB_USER || 'root',
     password: process.env.DB_PASS || 'password',
-    database: process.env.DB_NAME || 'cp3407'
+    database: schemaName
   });
 
   const [tables] = await connection.query(`
     SELECT TABLE_NAME
     FROM information_schema.tables
-    WHERE table_schema = 'cp3407' AND table_type = 'BASE TABLE'
+    WHERE table_schema = ? AND table_type = 'BASE TABLE'
     ORDER BY TABLE_NAME
-  `);
+  `, [schemaName]);
 
   const statements = [];
   statements.push(`-- Auto-generated sample data: default ${DEFAULT_ROWS_PER_TABLE} rows per table with table-specific overrides`);
-  statements.push(`USE \`${process.env.DB_NAME || 'cp3407'}\`;`);
+  statements.push(`USE \`${schemaName}\`;`);
   statements.push('SET FOREIGN_KEY_CHECKS = 0;');
   statements.push('');
 
@@ -317,9 +319,9 @@ async function generate() {
     const [columns] = await connection.query(`
       SELECT TABLE_NAME, COLUMN_NAME, DATA_TYPE, COLUMN_TYPE, IS_NULLABLE, EXTRA
       FROM information_schema.columns
-      WHERE table_schema = 'cp3407' AND table_name = ?
+      WHERE table_schema = ? AND table_name = ?
       ORDER BY ORDINAL_POSITION
-    `, [tableName]);
+    `, [schemaName, tableName]);
 
     const insertableColumns = columns.filter((column) => {
       const extra = String(column.EXTRA || '').toLowerCase();
