@@ -3,107 +3,91 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FeedMe | Add Menu Item</title>
+    <title>FeedMe | Menu Editor</title>
     <link rel="stylesheet" href="style.css">
-    <style>
-        /* Minimal inline styles; main styles from style.css */
-        .form-card {
-            background: #f9f9f9;
-            padding: 20px;
-            border-radius: 12px;
-            max-width: 400px;
-            margin: 0 auto;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        }
-        input, button {
-            width: 100%;
-            margin-top: 8px;
-            padding: 8px 12px;
-            border-radius: 6px;
-            border: 1px solid #ccc;
-        }
-        button {
-            background-color: #24422f;
-            color: white;
-            cursor: pointer;
-            margin-top: 12px;
-        }
-        ul#menuList {
-            margin-top: 20px;
-            padding-left: 20px;
-        }
-    </style>
 </head>
 <body>
     <main class="page-shell">
+        <section class="menu-topbar">
+            <button id="backButton" class="menu-back-button" type="button" aria-label="Go back to previous page">← Back</button>
+        </section>
+
+        <section id="restaurantProfile" class="restaurant-profile" aria-live="polite"></section>
+
         <section class="hero">
-            <p class="eyebrow">Add Menu Item</p>
-            <h1>Create a new menu entry</h1>
-            <p class="hero-copy">Add items that will be visible in the restaurant menu for customers.</p>
+            <p class="eyebrow">Menu Editor</p>
+            <h1>Edit restaurant menu</h1>
+            <p class="hero-copy">Looks like customer view, with edit mode to add, remove, and update items.</p>
         </section>
 
         <section class="list-panel">
-            <div class="form-card">
-                <form id="menuForm">
-                    <label for="itemName">Item Name:</label>
-                    <input type="text" id="itemName" placeholder="Enter menu item name" required>
-
-                    <label for="itemPrice">Price ($):</label>
-                    <input type="number" id="itemPrice" placeholder="Enter price" step="0.01" required>
-
-                    <button type="submit">Add Item</button>
-                </form>
-
-                <h2>Current Menu</h2>
-                <ul id="menuList"></ul>
+            <div class="menu-editor-controls">
+                <button id="editModeButton" class="primary-link" type="button">Edit Menu</button>
+                <div id="editActions" class="menu-editor-action-row" hidden>
+                    <button id="openAddOverlayButton" class="refresh-button" type="button">Add</button>
+                    <button id="openRemoveOverlayButton" class="refresh-button menu-remove-action" type="button">Remove</button>
+                </div>
             </div>
+
+            <div id="editorStatus" class="status-message">Loading menu...</div>
+            <div id="categoryTabs" class="menu-category-tabs" aria-label="Menu categories"></div>
+            <div id="menuContainer" class="menu-category-sections"></div>
         </section>
     </main>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            // Get menu from localStorage or start empty
-            const menuItems = JSON.parse(localStorage.getItem('menuItems')) || [];
+    <div id="editorBackdrop" class="menu-editor-backdrop" hidden></div>
 
-            const menuList = document.getElementById('menuList');
-            const form = document.getElementById('menuForm');
+    <section id="addItemOverlay" class="menu-editor-overlay" hidden>
+        <div class="menu-editor-overlay-card">
+            <div class="menu-editor-overlay-header">
+                <h2>Add menu item</h2>
+                <button type="button" class="menu-editor-close" data-close-overlay="addItemOverlay">✕</button>
+            </div>
+            <form id="addItemForm" class="menu-editor-form">
+                <label>Item name<input id="addItemName" type="text" required></label>
+                <label>Category<input id="addItemCategory" type="text" placeholder="e.g. Deals"></label>
+                <label>Description<textarea id="addItemDescription" rows="3"></textarea></label>
+                <label>Image URL<input id="addItemImage" type="text"></label>
+                <label>Price ($)<input id="addItemPrice" type="number" step="0.01" required></label>
+                <button class="primary-link" type="submit">Save item</button>
+            </form>
+        </div>
+    </section>
 
-            // Function to render menu list
-            function renderMenu() {
-                menuList.innerHTML = '';
-                menuItems.forEach(item => {
-                    const li = document.createElement('li');
-                    li.textContent = `${item.name} - $${item.price.toFixed(2)}`;
-                    menuList.appendChild(li);
-                });
-            }
+    <section id="removeItemsOverlay" class="menu-editor-overlay" hidden>
+        <div class="menu-editor-overlay-card menu-editor-overlay-card-large">
+            <div class="menu-editor-overlay-header">
+                <h2>Remove menu items</h2>
+                <button type="button" class="menu-editor-close" data-close-overlay="removeItemsOverlay">✕</button>
+            </div>
+            <div id="removeSelectionList" class="menu-remove-list"></div>
+            <div class="menu-editor-overlay-footer-fixed">
+                <button id="confirmRemoveButton" class="menu-remove-submit" type="button">Remove selected</button>
+            </div>
+        </div>
+    </section>
 
-            // Initial render
-            renderMenu();
+    <section id="editItemOverlay" class="menu-editor-overlay" hidden>
+        <div class="menu-editor-overlay-card">
+            <div class="menu-editor-overlay-header">
+                <h2>Menu item details</h2>
+                <button type="button" class="menu-editor-close" data-close-overlay="editItemOverlay">✕</button>
+            </div>
+            <form id="editItemForm" class="menu-editor-form">
+                <label>Item name<input id="editItemName" type="text" required disabled></label>
+                <label>Category<input id="editItemCategory" type="text" disabled></label>
+                <label>Description<textarea id="editItemDescription" rows="3" disabled></textarea></label>
+                <label>Image URL<input id="editItemImage" type="text" disabled></label>
+                <label>Price ($)<input id="editItemPrice" type="number" step="0.01" required disabled></label>
+                <div class="menu-editor-overlay-actions">
+                    <button id="editItemToggleButton" class="refresh-button" type="button">Edit</button>
+                    <button id="saveItemChangesButton" class="primary-link" type="submit" hidden>Save changes</button>
+                </div>
+            </form>
+        </div>
+    </section>
 
-            // Handle form submit
-            form.addEventListener('submit', (e) => {
-                e.preventDefault();
-                const name = document.getElementById('itemName').value;
-                const price = parseFloat(document.getElementById('itemPrice').value);
-
-                if (!name || !price) {
-                    alert('Please fill in all fields');
-                    return;
-                }
-
-                // Add new item to array
-                menuItems.push({ name, price });
-                localStorage.setItem('menuItems', JSON.stringify(menuItems));
-
-                // Re-render menu
-                renderMenu();
-
-                // Clear form
-                form.reset();
-            });
-        });
-    </script>
+    <script src="features/add-menu-items.js"></script>
     <script src="features/cart-overlay.js"></script>
 </body>
 </html>
