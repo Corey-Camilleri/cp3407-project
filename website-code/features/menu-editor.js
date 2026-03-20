@@ -393,7 +393,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     document.querySelectorAll('[data-close-overlay]').forEach((button) => {
-        button.addEventListener('click', () => {
+        button.addEventListener('click', (event) => {
+            event.preventDefault();
+            event.stopPropagation();
+
             const target = button.getAttribute('data-close-overlay');
             if (!target) {
                 return;

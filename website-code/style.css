@@ -1043,6 +1043,10 @@ h3 {
 	z-index: 1200;
 }
 
+.customer-item-overlay-backdrop[hidden] {
+	display: none;
+}
+
 .customer-item-overlay {
 	position: fixed;
 	inset: 0;
@@ -1051,6 +1055,10 @@ h3 {
 	align-items: center;
 	justify-content: center;
 	z-index: 1210;
+}
+
+.customer-item-overlay[hidden] {
+	display: none;
 }
 
 .customer-item-overlay-card {

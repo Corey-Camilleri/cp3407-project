@@ -59,8 +59,32 @@
         document.body.appendChild(backdrop);
         document.body.appendChild(panel);
 
-        closeButton.addEventListener('click', close);
-        backdrop.addEventListener('click', close);
+        closeButton.addEventListener('click', (event) => {
+            event.preventDefault();
+            event.stopPropagation();
+            close();
+        });
+
+        panel.addEventListener('click', (event) => {
+            event.stopPropagation();
+        });
+
+        backdrop.addEventListener('click', (event) => {
+            if (event.target !== backdrop) {
+                return;
+            }
+            close();
+        });
+
+        document.addEventListener('keydown', (event) => {
+            if (event.key !== 'Escape') {
+                return;
+            }
+
+            if (panel && !panel.hidden) {
+                close();
+            }
+        });
     }
 
     function formatPrice(value) {
