@@ -29,7 +29,7 @@ const activeMenuItems = document.getElementById('activeMenuItems');
 
 const params = new URLSearchParams(window.location.search);
 const operatorRole = String(params.get('role') || 'owner').toLowerCase() === 'admin' ? 'Admin' : 'Owner';
-const requestedAccountId = Number(params.get('accountId') || 0);
+const requestedAccountId = Number(params.get('accountId') || (operatorRole === 'Owner' ? 1 : 0));
 
 let restaurants = [];
 let accounts = [];
@@ -271,7 +271,7 @@ function renderAccountProfile() {
 
   if (adminTestButton) {
     if (operatorRole === 'Admin') {
-      adminTestButton.textContent = `Admin test: switch account (${activeAccount.accountId})`;
+      adminTestButton.textContent = `Back to owner mode (account ${activeAccount.accountId})`;
     } else {
       adminTestButton.textContent = 'Admin test mode';
     }
@@ -308,22 +308,28 @@ function bindAdminTestAction() {
       return;
     }
 
-    const currentIndex = accounts.findIndex((entry) => activeAccount && Number(entry.accountId) === Number(activeAccount.accountId));
-    const nextIndex = currentIndex >= 0 ? (currentIndex + 1) % accounts.length : 0;
-    const nextAccount = accounts[nextIndex];
-
     const nextParams = new URLSearchParams(window.location.search);
-    nextParams.set('role', 'admin');
-    nextParams.set('accountId', String(nextAccount.accountId));
+
+    if (operatorRole === 'Admin') {
+      nextParams.set('role', 'owner');
+      nextParams.set('accountId', String(activeAccount ? activeAccount.accountId : 1));
+    } else {
+      nextParams.set('role', 'admin');
+      nextParams.set('accountId', String(activeAccount ? activeAccount.accountId : 1));
+    }
+
     window.location.search = nextParams.toString();
   });
 }
 
 function buildAccounts(allRestaurants) {
   const accountMap = new Map();
+  const hasMerchantIds = allRestaurants.some((restaurant) => Number(restaurant && restaurant.merchantPersonId ? restaurant.merchantPersonId : 0) > 0);
 
   allRestaurants.forEach((restaurant) => {
-    const accountId = Number(restaurant && restaurant.merchantPersonId ? restaurant.merchantPersonId : 0) || 1;
+    const merchantId = Number(restaurant && restaurant.merchantPersonId ? restaurant.merchantPersonId : 0);
+    const fallbackAccountId = Number(restaurant && restaurant.id ? restaurant.id : 1);
+    const accountId = hasMerchantIds && merchantId > 0 ? merchantId : fallbackAccountId;
 
     if (!accountMap.has(accountId)) {
       accountMap.set(accountId, {
@@ -364,7 +370,6 @@ async function loadRestaurants() {
 
     if (!restaurants.length) {
       restaurantStatus.textContent = 'No restaurants available yet.';
-      restaurantSelector.innerHTML = '';
       restaurantMenuDisplay.innerHTML = '';
       renderAccountProfile();
       if (managedRestaurantsSections) {
