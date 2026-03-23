@@ -767,10 +767,20 @@ document.addEventListener('DOMContentLoaded', () => {
             const bundleItemIds = Array.from(bundleItems?.querySelectorAll('input[name="bundleItem"]:checked') || [])
                 .map((input) => Number(input.value));
 
-            if (!name || bundleItemIds.length < 2 || !Number.isFinite(bundlePrice) || bundlePrice <= 0) {
+            if (!name) {
+                setEditorStatus('Please enter a bundle name.');
                 return;
             }
 
+            if (bundleItemIds.length < 2) {
+                setEditorStatus('Please select at least two items for the bundle.');
+                return;
+            }
+
+            if (!Number.isFinite(bundlePrice) || bundlePrice <= 0) {
+                setEditorStatus('Please enter a valid bundle price greater than zero.');
+                return;
+            }
             discounts.push({
                 id: Date.now(),
                 name,

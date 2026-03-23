@@ -8,7 +8,7 @@ const app = express();
 app.use(express.json());
 const staticDirectory = path.join(__dirname);
 app.use(express.static(staticDirectory));
-app.use('/website-code', express.static(staticDirectory));
+
 
 // Database connection
 const sequelize = new Sequelize(
