@@ -1483,6 +1483,51 @@ h3 {
 	text-decoration: none;
 }
 
+.profile-form-grid {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	gap: 10px;
+}
+
+.profile-form-grid .full {
+	grid-column: 1 / -1;
+}
+
+.profile-status-card {
+	margin-top: 18px;
+}
+
+.profile-admin-note {
+	margin: 10px 0 0;
+	color: var(--muted);
+}
+
+.profiles-local-list {
+	list-style: none;
+	padding: 0;
+	margin: 0;
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+	gap: 10px;
+}
+
+.status-feedback {
+	margin: 12px 0 0;
+	font-weight: 700;
+}
+
+.status-feedback.status-success {
+	color: #1f7a39;
+}
+
+.status-feedback.status-error {
+	color: #8c2a2a;
+}
+
+.status-feedback.status-warning {
+	color: #8b5e34;
+}
+
 @media (max-width: 640px) {
 	.page-shell {
 		width: min(100% - 20px, 1100px);
@@ -1552,6 +1597,10 @@ h3 {
 
 	.menu-editor-overlay {
 		padding: 12px;
+	}
+
+	.profile-form-grid {
+		grid-template-columns: 1fr;
 	}
 
 	.customer-item-overlay {
