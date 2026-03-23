@@ -107,7 +107,23 @@
             </article>
         </section>
 
-        <section id="menu-display" class="list-panel" hidden>
+        <section class="list-panel" id="opening-hours">
+            <div class="panel-header">
+                <div>
+                    <p class="section-label">Availability hours</p>
+                    <h2>Opening hours</h2>
+                    <p class="panel-copy">Hours are stored per restaurant and shown to staff here.</p>
+                </div>
+                <div class="hero-actions">
+                    <button id="editOpeningHoursButton" class="primary-link" type="button">Edit hours</button>
+                </div>
+            </div>
+
+            <p id="openingHoursStatus" class="status-message">Loading opening hours...</p>
+            <div id="openingHoursList" class="menu-display-list"></div>
+        </section>
+
+        <section id="menu-display" class="list-panel">
             <div class="panel-header">
                 <div>
                     <p class="section-label">Menu display</p>
@@ -124,7 +140,27 @@
         </section>
     </main>
 
+    <div id="openingHoursBackdrop" class="menu-editor-backdrop" hidden></div>
+
+    <section id="openingHoursOverlay" class="menu-editor-overlay" hidden aria-hidden="true">
+        <article class="menu-editor-overlay-card" role="dialog" aria-modal="true" aria-label="Edit opening hours">
+            <header class="menu-editor-overlay-header">
+                <h2>Edit opening hours</h2>
+                <button type="button" class="menu-editor-close" data-close-opening-hours aria-label="Close opening hours editor">✕</button>
+            </header>
+
+            <p class="section-label">Weekly schedule</p>
+            <div id="openingHoursEditorList" class="menu-display-list"></div>
+
+            <div class="menu-editor-overlay-footer-fixed">
+                <button type="button" id="openingHoursCancelButton" class="secondary-link" hidden>Cancel</button>
+                <button type="button" id="openingHoursSaveButton" class="primary-link" hidden>Save</button>
+            </div>
+        </article>
+    </section>
+
     <script src="features/restaurant-home.js"></script>
     <script src="features/logout.js"></script>
+    <script src="features/manage-opening-hours.js"></script>
 </body>
 </html>

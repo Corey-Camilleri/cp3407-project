@@ -232,7 +232,13 @@ function renderSelectedRestaurant(restaurantId) {
   renderBranchProfile(restaurant);
   renderStats(restaurant, menuItems.filter((item) => item.available).length);
   renderMenuDisplay(restaurant);
-  restaurantStatus.textContent = `Showing dashboard for ${getBranchDisplayName(restaurant)}.`;
+  restaurantStatus.textContent = `Showing dashboard for ${restaurant.name}.`;
+
+  document.dispatchEvent(new CustomEvent('restaurant:selected', {
+    detail: {
+      restaurantId: String(restaurant.id)
+    }
+  }));
 }
 
 function renderManagedRestaurantsSection() {

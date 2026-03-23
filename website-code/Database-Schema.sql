@@ -123,6 +123,27 @@ CREATE INDEX `fk_Restaurant_Merchant1_idx` ON `Restaurant` (`Merchant_Person_ID`
 
 
 -- -----------------------------------------------------
+-- Table `Opening_Hour`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `Opening_Hour` (
+  `Opening_Hour_ID` INT NOT NULL AUTO_INCREMENT,
+  `Restaurant_ID` INT NOT NULL,
+  `Day_Of_Week` ENUM('Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday') NOT NULL,
+  `Open_Time` TIME NOT NULL,
+  `Close_Time` TIME NOT NULL,
+  PRIMARY KEY (`Opening_Hour_ID`),
+  UNIQUE INDEX `uq_restaurant_day` (`Restaurant_ID` ASC, `Day_Of_Week` ASC) VISIBLE,
+  CONSTRAINT `fk_Opening_Hour_Restaurant1`
+    FOREIGN KEY (`Restaurant_ID`)
+    REFERENCES `Restaurant` (`Restaurant_ID`)
+    ON DELETE CASCADE
+    ON UPDATE NO ACTION
+) ENGINE = InnoDB;
+
+CREATE INDEX `fk_Opening_Hour_Restaurant1_idx` ON `Opening_Hour` (`Restaurant_ID` ASC) VISIBLE;
+
+
+-- -----------------------------------------------------
 -- Table `Menu`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `Menu` (
