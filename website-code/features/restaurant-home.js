@@ -28,7 +28,25 @@ const avgOrderValue = document.getElementById('avgOrderValue');
 const activeMenuItems = document.getElementById('activeMenuItems');
 
 const params = new URLSearchParams(window.location.search);
-const operatorRole = String(params.get('role') || 'owner').toLowerCase() === 'admin' ? 'Admin' : 'Owner';
+const sessionStorageKey = 'feedme_session';
+
+function loadSession() {
+  try {
+    const raw = sessionStorage.getItem(sessionStorageKey);
+    if (!raw) {
+      return null;
+    }
+
+    const parsed = JSON.parse(raw);
+    return parsed && typeof parsed === 'object' ? parsed : null;
+  } catch (error) {
+    return null;
+  }
+}
+
+const activeSession = loadSession();
+const roleSource = String(params.get('role') || (activeSession && activeSession.role) || 'owner').toLowerCase();
+const operatorRole = roleSource === 'admin' ? 'Admin' : 'Owner';
 const requestedAccountId = Number(params.get('accountId') || (operatorRole === 'Owner' ? 1 : 0));
 const ownerFallbackAccountId = Number(params.get('accountId') || 1);
 
@@ -262,12 +280,14 @@ function renderAccountProfile() {
   }
 
   const groupedBrands = groupByBrand(activeAccount.restaurants);
-  const accountLabel = operatorRole === 'Admin'
-    ? 'Admin (all accounts)'
-    : `${operatorRole} ${activeAccount.accountId}`;
+  const personName = activeSession && activeSession.fullName ? activeSession.fullName : 'Guest user';
+  const personEmail = activeSession && activeSession.email ? activeSession.email : 'No session email';
+  const personRole = activeSession && activeSession.role
+    ? String(activeSession.role).charAt(0).toUpperCase() + String(activeSession.role).slice(1)
+    : operatorRole;
 
-  accountName.textContent = accountLabel;
-  accountSummary.textContent = `${accountLabel} manages ${activeAccount.restaurants.length} restaurant branch${activeAccount.restaurants.length === 1 ? '' : 'es'} across ${groupedBrands.length} brand${groupedBrands.length === 1 ? '' : 's'}.`;
+  accountName.textContent = personName;
+  accountSummary.textContent = `${personRole} • ${personEmail}`;
   accountRole.textContent = operatorRole;
   accountRestaurantCount.textContent = String(activeAccount.restaurants.length);
   accountBrandCount.textContent = String(groupedBrands.length);
