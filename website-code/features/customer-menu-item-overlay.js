@@ -91,21 +91,30 @@
             const itemId = Number(currentItem.id || 0);
             const safeName = currentItem.name ? String(currentItem.name) : 'Menu item';
             const safePrice = Number(currentItem.price || 0);
+            const fallbackRestaurantId = new URLSearchParams(window.location.search).get('restaurantId');
+            const safeRestaurantId = Number(currentItem.restaurantId || fallbackRestaurantId || 0);
             const existingIndex = cart.findIndex((entry) => {
-                const sameId = itemId > 0 && Number(entry && entry.id ? entry.id : 0) === itemId;
+                const entryRestaurantId = Number(entry && entry.restaurantId ? entry.restaurantId : 0);
+                const sameRestaurant = safeRestaurantId > 0 ? entryRestaurantId === safeRestaurantId : true;
+                const sameId = itemId > 0 && Number(entry && entry.id ? entry.id : 0) === itemId && sameRestaurant;
                 const sameFallback = String(entry && entry.name ? entry.name : '') === safeName
-                    && Number(entry && entry.price ? entry.price : 0) === safePrice;
+                    && Number(entry && entry.price ? entry.price : 0) === safePrice
+                    && sameRestaurant;
                 return sameId || sameFallback;
             });
 
             if (existingIndex >= 0) {
                 const currentQty = Number(cart[existingIndex].qty || 0);
                 cart[existingIndex].qty = currentQty > 0 ? currentQty + 1 : 1;
+                if (safeRestaurantId > 0 && Number(cart[existingIndex].restaurantId || 0) <= 0) {
+                    cart[existingIndex].restaurantId = safeRestaurantId;
+                }
             } else {
                 cart.push({
                     id: itemId > 0 ? itemId : undefined,
                     name: safeName,
                     price: safePrice,
+                    restaurantId: safeRestaurantId > 0 ? safeRestaurantId : undefined,
                     qty: 1
                 });
             }

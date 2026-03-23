@@ -1194,6 +1194,115 @@ h3 {
 	overflow: hidden;
 }
 
+.checkout-area {
+	display: grid;
+	gap: 18px;
+}
+
+.checkout-item-list {
+	display: grid;
+	grid-template-columns: 1fr;
+	gap: 12px;
+}
+
+.checkout-item-card {
+	padding: 16px;
+	border-radius: 16px;
+	background: #fffefb;
+	border: 1px solid rgba(75, 95, 78, 0.12);
+}
+
+.checkout-item-topline {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	gap: 12px;
+}
+
+.checkout-item-topline h3 {
+	margin: 0;
+	font-size: 1.12rem;
+	line-height: 1.2;
+}
+
+.checkout-item-qty {
+	font-weight: 800;
+	color: var(--ink);
+	min-width: 36px;
+	text-align: right;
+}
+
+.checkout-item-description {
+	margin: 8px 0 0;
+	color: var(--muted);
+	line-height: 1.45;
+}
+
+.checkout-lower {
+	margin-top: 6px;
+}
+
+.checkout-form-row {
+	align-items: flex-start;
+	flex-wrap: wrap;
+}
+
+.checkout-delivery-column {
+	min-width: 260px;
+	flex: 1;
+}
+
+.checkout-summary-column {
+	width: min(360px, 100%);
+}
+
+.checkout-summary-card {
+	padding: 18px;
+	border-radius: 18px;
+}
+
+.checkout-summary-meta {
+	gap: 8px;
+}
+
+.checkout-summary-meta dt,
+.checkout-summary-meta dd {
+	font-size: 0.98rem;
+}
+
+.checkout-total-row dt,
+.checkout-total-row dd {
+	font-size: 1.08rem;
+	font-weight: 800;
+	color: var(--ink);
+}
+
+.checkout-fee-note {
+	margin: 12px 0 0;
+	font-size: 0.9rem;
+	line-height: 1.4;
+	color: var(--muted);
+}
+
+.checkout-summary-actions {
+	margin-top: 14px;
+	display: flex;
+	gap: 8px;
+	align-items: center;
+	flex-wrap: wrap;
+}
+
+.checkout-back-link {
+	align-self: center;
+	color: var(--deep-green);
+	text-decoration: none;
+	font-weight: 700;
+}
+
+.checkout-back-link:hover {
+	text-decoration: underline;
+}
+
 @media (max-width: 640px) {
 	.page-shell {
 		width: min(100% - 20px, 1100px);
@@ -1271,5 +1380,18 @@ h3 {
 
 	.customer-item-overlay-image {
 		height: 200px;
+	}
+
+	.checkout-summary-column {
+		width: 100%;
+	}
+
+	.checkout-summary-actions {
+		flex-direction: column;
+		align-items: stretch;
+	}
+
+	.checkout-back-link {
+		align-self: flex-start;
 	}
 }

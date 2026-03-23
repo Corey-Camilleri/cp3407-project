@@ -22,12 +22,12 @@
 				</div>
 			</div>
 
-			<div id="checkoutArea">
-				<div id="orderItems" class="restaurant-grid"></div>
+			<div id="checkoutArea" class="checkout-area">
+				<div id="orderItems" class="checkout-item-list"></div>
 
-				<div style="margin-top:18px; flex-wrap:wrap;">
-					<div class="form-row">
-						<div class="form-column" style="min-width:260px;">
+				<div class="checkout-lower">
+					<div class="form-row checkout-form-row">
+						<div class="form-column checkout-delivery-column">
 							<h3>Delivery details</h3>
 							<div id="deliveryDetails">
 								<label>
@@ -45,17 +45,19 @@
 							</div>
 						</div>
 
-						<div style="width:320px;">
+						<div class="checkout-summary-column">
 						<h3>Order summary</h3>
-						<div class="restaurant-card">
-							<div class="meta-list">
+						<div class="restaurant-card checkout-summary-card">
+							<div class="meta-list checkout-summary-meta">
 								<div><dt>Subtotal</dt><dd id="subtotal">$0.00</dd></div>
-								<div><dt>Delivery fee</dt><dd id="deliveryFee">$0.00</dd></div>
-								<div><dt>Total</dt><dd id="total">$0.00</dd></div>
+								<div><dt>Base delivery fee</dt><dd id="deliveryFee">$0.00</dd></div>
+								<div id="extraDeliveryRow"><dt>Extra multi-restaurant fee</dt><dd id="extraDeliveryFee">$0.00</dd></div>
+								<div class="checkout-total-row"><dt>Total</dt><dd id="total">$0.00</dd></div>
 							</div>
-							<div style="margin-top:16px; display:flex; gap:8px;">
+							<p id="restaurantMixNote" class="checkout-fee-note"></p>
+							<div class="checkout-summary-actions">
 								<button id="placeOrderBtn" class="refresh-button" type="button">Place order</button>
-								<a href="index.html" style="align-self:center; color:#24422f; text-decoration:none;">Back to restaurants</a>
+								<a href="index.html" class="checkout-back-link">Back to restaurants</a>
 							</div>
 							<div id="checkoutMessage" class="status-message"></div>
 						</div>
