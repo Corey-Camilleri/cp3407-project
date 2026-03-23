@@ -579,6 +579,45 @@ INSERT INTO `Restaurant` (`Restaurant_ID`, `Merchant_Person_ID`, `Name`, `Phone`
 (4, 9, 'Green Leaf', 47221004, 'Healthy bowls and wraps', '/img/green-logo.png', 'ACTIVE', 9),
 (5, 10, 'Sunrise Burgers', 47221005, 'Burgers, wings and shakes', '/img/burger-logo.png', 'ACTIVE', 10);
 
+-- Opening_Hour
+DELETE FROM `Opening_Hour`;
+INSERT INTO `Opening_Hour` (`Restaurant_ID`, `Day_Of_Week`, `Open_Time`, `Close_Time`) VALUES
+(1, 'Monday', '09:00:00', '21:00:00'),
+(1, 'Tuesday', '09:00:00', '21:00:00'),
+(1, 'Wednesday', '09:00:00', '21:00:00'),
+(1, 'Thursday', '09:00:00', '21:00:00'),
+(1, 'Friday', '09:00:00', '22:00:00'),
+(1, 'Saturday', '10:00:00', '22:00:00'),
+(1, 'Sunday', '10:00:00', '20:00:00'),
+(2, 'Monday', '10:00:00', '22:00:00'),
+(2, 'Tuesday', '10:00:00', '22:00:00'),
+(2, 'Wednesday', '10:00:00', '22:00:00'),
+(2, 'Thursday', '10:00:00', '22:00:00'),
+(2, 'Friday', '10:00:00', '23:00:00'),
+(2, 'Saturday', '10:00:00', '23:00:00'),
+(2, 'Sunday', '10:00:00', '21:00:00'),
+(3, 'Monday', '11:00:00', '21:00:00'),
+(3, 'Tuesday', '11:00:00', '21:00:00'),
+(3, 'Wednesday', '11:00:00', '21:00:00'),
+(3, 'Thursday', '11:00:00', '21:00:00'),
+(3, 'Friday', '11:00:00', '22:30:00'),
+(3, 'Saturday', '11:00:00', '22:30:00'),
+(3, 'Sunday', '11:00:00', '20:30:00'),
+(4, 'Monday', '08:00:00', '20:00:00'),
+(4, 'Tuesday', '08:00:00', '20:00:00'),
+(4, 'Wednesday', '08:00:00', '20:00:00'),
+(4, 'Thursday', '08:00:00', '20:00:00'),
+(4, 'Friday', '08:00:00', '21:00:00'),
+(4, 'Saturday', '09:00:00', '21:00:00'),
+(4, 'Sunday', '09:00:00', '19:00:00'),
+(5, 'Monday', '10:30:00', '22:00:00'),
+(5, 'Tuesday', '10:30:00', '22:00:00'),
+(5, 'Wednesday', '10:30:00', '22:00:00'),
+(5, 'Thursday', '10:30:00', '22:00:00'),
+(5, 'Friday', '10:30:00', '23:30:00'),
+(5, 'Saturday', '10:30:00', '23:30:00'),
+(5, 'Sunday', '10:30:00', '21:30:00');
+
 -- Restaurant_Rating_ID
 DELETE FROM `Restaurant_Rating_ID`;
 INSERT INTO `Restaurant_Rating_ID` (`Rating_ID`, `Restaurant_ID`, `Score`, `Order_ID`) VALUES
