@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FeedMe | Create Account</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <main class="page-shell">
+        <header class="topbar">
+            <div>
+                <p class="brand-mark">FeedMe</p>
+                <p class="brand-subtitle">Create a new account to start ordering or managing restaurants.</p>
+            </div>
+            <nav class="topnav" aria-label="Primary navigation">
+                <a href="index.html">Customer home</a>
+                <a href="login.html">Login</a>
+            </nav>
+        </header>
+
+        <section class="hero">
+            <p class="eyebrow">Authentication</p>
+            <h1>Create account</h1>
+            <p class="hero-copy">Sign up as a customer or owner.</p>
+        </section>
+
+        <section class="list-panel">
+            <div class="panel-header">
+                <div>
+                    <p class="section-label">Register</p>
+                    <h2>New account</h2>
+                    <p class="panel-copy">Your account is stored locally for this demo environment.</p>
+                </div>
+            </div>
+
+            <form id="signupForm" class="menu-editor-form">
+                <label>Full name<input id="signupFullName" type="text" required placeholder="Your full name"></label>
+                <label>Email<input id="signupEmail" type="email" required placeholder="you@example.com"></label>
+                <label>Role
+                    <select id="signupRole" required>
+                        <option value="customer">Customer</option>
+                        <option value="owner">Restaurant owner</option>
+                    </select>
+                </label>
+                <label>Password<input id="signupPassword" type="password" required placeholder="At least 8 characters"></label>
+                <label>Confirm password<input id="signupConfirmPassword" type="password" required placeholder="Re-enter password"></label>
+                <button class="primary-link" type="submit">Create account</button>
+            </form>
+
+            <p id="signupMessage" class="status-message"></p>
+            <p class="status-message">Already have an account? <a href="login.html">Login here</a>.</p>
+        </section>
+    </main>
+
+    <script src="features/signup.js"></script>
+</body>
+</html>
