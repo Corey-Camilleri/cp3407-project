@@ -1,4 +1,6 @@
 (function () {
+    let restaurantLabelById = new Map();
+
     function loadCart() {
         try {
             const raw = localStorage.getItem('cart');
@@ -19,6 +21,118 @@
 
     function totalPrice(cart) {
         return cart.reduce((sum, item) => sum + Number(item.price || 0) * Number(item.qty || 0), 0);
+    }
+
+    function uniqueRestaurantCount(cart) {
+        const ids = new Set();
+        cart.forEach((item) => {
+            const restaurantId = Number(item && item.restaurantId ? item.restaurantId : 0);
+            if (Number.isFinite(restaurantId) && restaurantId > 0) {
+                ids.add(restaurantId);
+            }
+        });
+
+        return ids.size;
+    }
+
+    function getRestaurantGroupKey(item) {
+        const restaurantId = Number(item && item.restaurantId ? item.restaurantId : 0);
+        const restaurantName = String(item && item.restaurantName ? item.restaurantName : '').trim();
+
+        if (restaurantId > 0) {
+            return `id:${restaurantId}`;
+        }
+
+        if (restaurantName) {
+            return `name:${restaurantName.toLowerCase()}`;
+        }
+
+        return 'unknown';
+    }
+
+    function getRestaurantGroupLabel(item) {
+        const restaurantName = String(item && item.restaurantName ? item.restaurantName : '').trim();
+        if (restaurantName) {
+            return restaurantName;
+        }
+
+        const restaurantId = Number(item && item.restaurantId ? item.restaurantId : 0);
+        if (restaurantId > 0) {
+            return restaurantLabelById.get(restaurantId) || `Restaurant #${restaurantId}`;
+        }
+
+        return 'Restaurant';
+    }
+
+    function groupCartItems(cart) {
+        const grouped = new Map();
+
+        cart.forEach((item, index) => {
+            const key = getRestaurantGroupKey(item);
+            if (!grouped.has(key)) {
+                grouped.set(key, {
+                    label: getRestaurantGroupLabel(item),
+                    rows: []
+                });
+            }
+
+            grouped.get(key).rows.push({ item, index });
+        });
+
+        return Array.from(grouped.values());
+    }
+
+    async function loadRestaurantLabels() {
+        try {
+            const response = await fetch('/api/restaurants');
+            if (!response.ok) {
+                return;
+            }
+
+            const restaurants = await response.json();
+            if (!Array.isArray(restaurants)) {
+                return;
+            }
+
+            const nameCounts = new Map();
+            restaurants.forEach((restaurant) => {
+                const name = String(restaurant && restaurant.name ? restaurant.name : '').trim();
+                if (!name) {
+                    return;
+                }
+
+                const key = name.toLowerCase();
+                nameCounts.set(key, Number(nameCounts.get(key) || 0) + 1);
+            });
+
+            const nextMap = new Map();
+            restaurants.forEach((restaurant) => {
+                const id = Number(restaurant && restaurant.id ? restaurant.id : 0);
+                if (id <= 0) {
+                    return;
+                }
+
+                const name = String(restaurant && restaurant.name ? restaurant.name : '').trim() || `Restaurant #${id}`;
+                const duplicateCount = Number(nameCounts.get(name.toLowerCase()) || 0);
+                const location = String(
+                    restaurant.location
+                    || restaurant.address
+                    || restaurant.suburb
+                    || restaurant.city
+                    || ''
+                ).trim();
+
+                if (duplicateCount > 1) {
+                    nextMap.set(id, `${name} — ${location || `Branch #${id}`}`);
+                } else {
+                    nextMap.set(id, name);
+                }
+            });
+
+            restaurantLabelById = nextMap;
+        } catch (error) {
+            restaurantLabelById = new Map();
+        }
     }
 
     function ensureNav() {
@@ -73,7 +187,10 @@
                 <div class="cart-overlay-list"></div>
             </div>
             <div class="cart-overlay-footer">
-                <strong class="cart-overlay-total">Total: $0.00</strong>
+                <div class="cart-overlay-summary">
+                    <strong class="cart-overlay-total">Total: $0.00</strong>
+                    <p class="cart-overlay-meta"></p>
+                </div>
                 <a href="/place_order.html" class="cart-overlay-checkout">Checkout</a>
             </div>
         `;
@@ -87,7 +204,8 @@
             closeButton: panel.querySelector('.cart-overlay-close'),
             emptyMessage: panel.querySelector('.cart-overlay-empty'),
             list: panel.querySelector('.cart-overlay-list'),
-            total: panel.querySelector('.cart-overlay-total')
+            total: panel.querySelector('.cart-overlay-total'),
+            meta: panel.querySelector('.cart-overlay-meta')
         };
     }
 
@@ -101,31 +219,61 @@
             state.emptyMessage.style.display = 'none';
         }
 
-        cart.forEach((item, index) => {
-            const row = document.createElement('div');
-            row.className = 'cart-overlay-item';
+        const groups = groupCartItems(cart);
 
-            const name = item && item.name ? item.name : `Item ${index + 1}`;
-            const qty = Number(item && item.qty ? item.qty : 1);
-            const price = Number(item && item.price ? item.price : 0);
+        groups.forEach((group) => {
+            const section = document.createElement('section');
+            section.className = 'cart-overlay-group';
 
-            row.innerHTML = `
-                <div class="cart-overlay-item-main">
-                    <strong>${name}</strong>
-                    <span>$${price.toFixed(2)} each</span>
-                </div>
-                <div class="cart-overlay-item-actions">
-                    <button type="button" data-action="decrease" data-index="${index}">−</button>
-                    <span>${qty}</span>
-                    <button type="button" data-action="increase" data-index="${index}">+</button>
-                    <button type="button" data-action="remove" data-index="${index}">✕</button>
-                </div>
-            `;
+            const heading = document.createElement('h3');
+            heading.className = 'cart-overlay-group-title';
+            heading.textContent = group.label;
+            section.appendChild(heading);
 
-            state.list.appendChild(row);
+            const groupedList = document.createElement('div');
+            groupedList.className = 'cart-overlay-group-list';
+
+            group.rows.forEach((rowEntry) => {
+                const row = document.createElement('div');
+                row.className = 'cart-overlay-item';
+
+                const item = rowEntry.item;
+                const index = rowEntry.index;
+                const name = item && item.name ? item.name : `Item ${index + 1}`;
+                const qty = Number(item && item.qty ? item.qty : 1);
+                const price = Number(item && item.price ? item.price : 0);
+                const lineTotal = price * qty;
+
+                row.innerHTML = `
+                    <div class="cart-overlay-item-main">
+                        <strong class="cart-overlay-item-name">${name}</strong>
+                        <span class="cart-overlay-item-unit">$${price.toFixed(2)} each</span>
+                    </div>
+                    <div class="cart-overlay-item-side">
+                        <strong class="cart-overlay-line-total">$${lineTotal.toFixed(2)}</strong>
+                        <div class="cart-overlay-item-actions">
+                            <button type="button" data-action="decrease" data-index="${index}" aria-label="Decrease quantity">−</button>
+                            <span class="cart-overlay-qty">${qty}</span>
+                            <button type="button" data-action="increase" data-index="${index}" aria-label="Increase quantity">+</button>
+                            <button type="button" data-action="remove" data-index="${index}" aria-label="Remove item">✕</button>
+                        </div>
+                    </div>
+                `;
+
+                groupedList.appendChild(row);
+            });
+
+            section.appendChild(groupedList);
+            state.list.appendChild(section);
         });
 
+        const itemCount = totalItems(cart);
+        const restaurantCount = uniqueRestaurantCount(cart);
+
         state.total.textContent = `Total: $${totalPrice(cart).toFixed(2)}`;
+        state.meta.textContent = itemCount > 0
+            ? `${itemCount} item${itemCount === 1 ? '' : 's'}${restaurantCount > 0 ? ` • ${restaurantCount} restaurant${restaurantCount === 1 ? '' : 's'}` : ''}`
+            : '';
     }
 
     function updateBadge(button) {
@@ -164,6 +312,12 @@
 
         const state = buildOverlay();
         updateBadge(iconButton);
+
+        loadRestaurantLabels().then(() => {
+            if (state.panel.classList.contains('is-open')) {
+                renderOverlay(state);
+            }
+        });
 
         iconButton.addEventListener('click', () => {
             const open = !state.panel.classList.contains('is-open');
@@ -215,6 +369,13 @@
         });
 
         window.addEventListener('focus', () => {
+            updateBadge(iconButton);
+            if (state.panel.classList.contains('is-open')) {
+                renderOverlay(state);
+            }
+        });
+
+        window.addEventListener('cart:updated', () => {
             updateBadge(iconButton);
             if (state.panel.classList.contains('is-open')) {
                 renderOverlay(state);

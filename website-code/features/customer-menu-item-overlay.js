@@ -5,6 +5,9 @@
     let nameEl;
     let descEl;
     let priceEl;
+    let addToCartButton;
+    let addToCartStatus;
+    let currentItem = null;
 
     function ensureOverlay() {
         if (backdrop && panel) {
@@ -47,9 +50,20 @@
         priceEl = document.createElement('p');
         priceEl.className = 'customer-item-overlay-price';
 
+        addToCartButton = document.createElement('button');
+        addToCartButton.type = 'button';
+        addToCartButton.className = 'customer-item-overlay-add';
+        addToCartButton.textContent = 'Add to cart';
+
+        addToCartStatus = document.createElement('p');
+        addToCartStatus.className = 'customer-item-overlay-status';
+        addToCartStatus.setAttribute('aria-live', 'polite');
+
         body.appendChild(nameEl);
         body.appendChild(descEl);
         body.appendChild(priceEl);
+        body.appendChild(addToCartButton);
+        body.appendChild(addToCartStatus);
 
         card.appendChild(closeButton);
         card.appendChild(imageEl);
@@ -63,6 +77,61 @@
             event.preventDefault();
             event.stopPropagation();
             close();
+        });
+
+        addToCartButton.addEventListener('click', (event) => {
+            event.preventDefault();
+            event.stopPropagation();
+
+            if (!currentItem) {
+                return;
+            }
+
+            const cart = loadCart();
+            const itemId = Number(currentItem.id || 0);
+            const safeName = currentItem.name ? String(currentItem.name) : 'Menu item';
+            const safePrice = Number(currentItem.price || 0);
+            const fallbackRestaurantId = new URLSearchParams(window.location.search).get('restaurantId');
+            const safeRestaurantId = Number(currentItem.restaurantId || fallbackRestaurantId || 0);
+            const profileHeading = document.querySelector('.restaurant-profile-text h2') || document.querySelector('#restaurantProfile h2');
+            const fallbackRestaurantName = profileHeading ? String(profileHeading.textContent || '').trim() : '';
+            const safeRestaurantName = String(currentItem.restaurantName || fallbackRestaurantName || '').trim();
+            const existingIndex = cart.findIndex((entry) => {
+                const entryRestaurantId = Number(entry && entry.restaurantId ? entry.restaurantId : 0);
+                const entryRestaurantName = String(entry && entry.restaurantName ? entry.restaurantName : '').trim().toLowerCase();
+                const sameRestaurant = safeRestaurantId > 0
+                    ? entryRestaurantId === safeRestaurantId
+                    : (safeRestaurantName ? entryRestaurantName === safeRestaurantName.toLowerCase() : true);
+                const sameId = itemId > 0 && Number(entry && entry.id ? entry.id : 0) === itemId && sameRestaurant;
+                const sameFallback = String(entry && entry.name ? entry.name : '') === safeName
+                    && Number(entry && entry.price ? entry.price : 0) === safePrice
+                    && sameRestaurant;
+                return sameId || sameFallback;
+            });
+
+            if (existingIndex >= 0) {
+                const currentQty = Number(cart[existingIndex].qty || 0);
+                cart[existingIndex].qty = currentQty > 0 ? currentQty + 1 : 1;
+                if (safeRestaurantId > 0 && Number(cart[existingIndex].restaurantId || 0) <= 0) {
+                    cart[existingIndex].restaurantId = safeRestaurantId;
+                }
+                if (safeRestaurantName && !String(cart[existingIndex].restaurantName || '').trim()) {
+                    cart[existingIndex].restaurantName = safeRestaurantName;
+                }
+            } else {
+                cart.push({
+                    id: itemId > 0 ? itemId : undefined,
+                    name: safeName,
+                    price: safePrice,
+                    restaurantId: safeRestaurantId > 0 ? safeRestaurantId : undefined,
+                    restaurantName: safeRestaurantName || undefined,
+                    qty: 1
+                });
+            }
+
+            saveCart(cart);
+            window.dispatchEvent(new CustomEvent('cart:updated'));
+            addToCartStatus.textContent = 'Added to cart.';
         });
 
         panel.addEventListener('click', (event) => {
@@ -97,8 +166,23 @@
         return Number.isFinite(numeric) ? `$${numeric.toFixed(2)}` : '$0.00';
     }
 
+    function loadCart() {
+        try {
+            const raw = localStorage.getItem('cart');
+            const parsed = raw ? JSON.parse(raw) : [];
+            return Array.isArray(parsed) ? parsed : [];
+        } catch (error) {
+            return [];
+        }
+    }
+
+    function saveCart(cart) {
+        localStorage.setItem('cart', JSON.stringify(cart));
+    }
+
     function open(item) {
         ensureOverlay();
+        currentItem = item || null;
 
         const safeName = item && item.name ? item.name : 'Menu item';
         const safeDescription = item && item.description ? item.description : 'No description provided.';
@@ -107,6 +191,7 @@
         nameEl.textContent = safeName;
         descEl.textContent = safeDescription;
         priceEl.textContent = formatPrice(item && item.price);
+        addToCartStatus.textContent = '';
         imageEl.src = safeImage;
         imageEl.alt = `${safeName} image`;
 
@@ -119,6 +204,8 @@
         if (!backdrop || !panel) {
             return;
         }
+
+        currentItem = null;
 
         backdrop.hidden = true;
         panel.hidden = true;
