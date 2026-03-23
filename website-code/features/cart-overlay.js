@@ -220,6 +220,13 @@
                 renderOverlay(state);
             }
         });
+
+        window.addEventListener('cart:updated', () => {
+            updateBadge(iconButton);
+            if (state.panel.classList.contains('is-open')) {
+                renderOverlay(state);
+            }
+        });
     }
 
     if (document.readyState === 'loading') {
