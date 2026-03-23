@@ -30,6 +30,7 @@ const activeMenuItems = document.getElementById('activeMenuItems');
 const params = new URLSearchParams(window.location.search);
 const operatorRole = String(params.get('role') || 'owner').toLowerCase() === 'admin' ? 'Admin' : 'Owner';
 const requestedAccountId = Number(params.get('accountId') || (operatorRole === 'Owner' ? 1 : 0));
+const ownerFallbackAccountId = Number(params.get('accountId') || 1);
 
 let restaurants = [];
 let accounts = [];
@@ -261,7 +262,9 @@ function renderAccountProfile() {
   }
 
   const groupedBrands = groupByBrand(activeAccount.restaurants);
-  const accountLabel = `${operatorRole} ${activeAccount.accountId}`;
+  const accountLabel = operatorRole === 'Admin'
+    ? 'Admin (all accounts)'
+    : `${operatorRole} ${activeAccount.accountId}`;
 
   accountName.textContent = accountLabel;
   accountSummary.textContent = `${accountLabel} manages ${activeAccount.restaurants.length} restaurant branch${activeAccount.restaurants.length === 1 ? '' : 'es'} across ${groupedBrands.length} brand${groupedBrands.length === 1 ? '' : 's'}.`;
@@ -271,7 +274,7 @@ function renderAccountProfile() {
 
   if (adminTestButton) {
     if (operatorRole === 'Admin') {
-      adminTestButton.textContent = `Back to owner mode (account ${activeAccount.accountId})`;
+      adminTestButton.textContent = `Back to owner mode (account ${ownerFallbackAccountId})`;
     } else {
       adminTestButton.textContent = 'Admin test mode';
     }
@@ -312,10 +315,10 @@ function bindAdminTestAction() {
 
     if (operatorRole === 'Admin') {
       nextParams.set('role', 'owner');
-      nextParams.set('accountId', String(activeAccount ? activeAccount.accountId : 1));
+      nextParams.set('accountId', String(ownerFallbackAccountId));
     } else {
       nextParams.set('role', 'admin');
-      nextParams.set('accountId', String(activeAccount ? activeAccount.accountId : 1));
+      nextParams.set('accountId', String(activeAccount ? activeAccount.accountId : ownerFallbackAccountId));
     }
 
     window.location.search = nextParams.toString();
@@ -347,6 +350,13 @@ function buildAccounts(allRestaurants) {
 function selectActiveAccount(allAccounts) {
   if (!allAccounts.length) {
     return null;
+  }
+
+  if (operatorRole === 'Admin') {
+    return {
+      accountId: 'ALL',
+      restaurants: allAccounts.flatMap((entry) => entry.restaurants)
+    };
   }
 
   const byRequest = requestedAccountId > 0
