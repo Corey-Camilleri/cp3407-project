@@ -70,6 +70,20 @@ body {
 	font-weight: 700;
 }
 
+.logout-nav-button {
+	border: 0;
+	background: transparent;
+	color: var(--ink);
+	font: inherit;
+	font-weight: 700;
+	cursor: pointer;
+	padding: 0;
+}
+
+.logout-nav-button:hover {
+	text-decoration: underline;
+}
+
 .hero {
 	padding: 24px 0 32px;
 }
