@@ -14,7 +14,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const phoneInput = document.getElementById('customerPhone');
 
     const BASE_DELIVERY_FEE = 5.00;
-    const EXTRA_DELIVERY_PER_ADDITIONAL_RESTAURANT = 2.50;
+    const EXTRA_DELIVERY_STEP = 2.50;
 
     function formatCurrency(v) {
         return '$' + v.toFixed(2);
@@ -31,16 +31,70 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function getUniqueRestaurantCount(cart) {
-        const restaurantIds = new Set();
+        const restaurantKeys = new Set();
 
         (Array.isArray(cart) ? cart : []).forEach((item) => {
             const restaurantId = Number(item && item.restaurantId ? item.restaurantId : 0);
             if (Number.isFinite(restaurantId) && restaurantId > 0) {
-                restaurantIds.add(restaurantId);
+                restaurantKeys.add(`id:${restaurantId}`);
+                return;
+            }
+
+            const restaurantName = String(item && item.restaurantName ? item.restaurantName : '').trim();
+            if (restaurantName) {
+                restaurantKeys.add(`name:${restaurantName.toLowerCase()}`);
             }
         });
 
-        return restaurantIds.size;
+        return restaurantKeys.size;
+    }
+
+    function getRestaurantGroupKey(item) {
+        const restaurantId = Number(item && item.restaurantId ? item.restaurantId : 0);
+        const restaurantName = String(item && item.restaurantName ? item.restaurantName : '').trim();
+
+        if (restaurantId > 0) {
+            return `id:${restaurantId}`;
+        }
+
+        if (restaurantName) {
+            return `name:${restaurantName.toLowerCase()}`;
+        }
+
+        return 'unknown';
+    }
+
+    function getRestaurantGroupLabel(item) {
+        const restaurantName = String(item && item.restaurantName ? item.restaurantName : '').trim();
+        if (restaurantName) {
+            return restaurantName;
+        }
+
+        const restaurantId = Number(item && item.restaurantId ? item.restaurantId : 0);
+        if (restaurantId > 0) {
+            return `Restaurant #${restaurantId}`;
+        }
+
+        return 'Restaurant';
+    }
+
+    function groupCartItemsByRestaurant(cart) {
+        const groups = new Map();
+
+        (Array.isArray(cart) ? cart : []).forEach((item) => {
+            const key = getRestaurantGroupKey(item);
+
+            if (!groups.has(key)) {
+                groups.set(key, {
+                    label: getRestaurantGroupLabel(item),
+                    items: []
+                });
+            }
+
+            groups.get(key).items.push(item);
+        });
+
+        return Array.from(groups.values());
     }
 
     function calculateOrderTotals(cart) {
@@ -48,7 +102,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const subtotal = safeCart.reduce((sum, item) => sum + Number(item && item.price ? item.price : 0) * Number(item && item.qty ? item.qty : 1), 0);
         const uniqueRestaurants = getUniqueRestaurantCount(safeCart);
         const additionalRestaurants = Math.max(0, uniqueRestaurants - 1);
-        const extraMultiRestaurantFee = additionalRestaurants * EXTRA_DELIVERY_PER_ADDITIONAL_RESTAURANT;
+        const extraMultiRestaurantFee = EXTRA_DELIVERY_STEP * (additionalRestaurants * (additionalRestaurants + 1) / 2);
         const deliveryFee = BASE_DELIVERY_FEE;
         const total = subtotal + deliveryFee + extraMultiRestaurantFee;
 
@@ -87,32 +141,45 @@ document.addEventListener('DOMContentLoaded', () => {
         checkoutMessage.textContent = '';
         placeOrderBtn.disabled = false;
 
-        cart.forEach(item => {
-            const lineTotal = (item.price || 0) * (item.qty || 1);
+        const groupedItems = groupCartItemsByRestaurant(cart);
 
-            const card = document.createElement('div');
-            card.className = 'checkout-item-card';
+        groupedItems.forEach((group) => {
+            const section = document.createElement('section');
+            section.className = 'checkout-restaurant-group';
 
-            const top = document.createElement('div');
-            top.className = 'checkout-item-topline';
+            const heading = document.createElement('h3');
+            heading.className = 'checkout-restaurant-heading';
+            heading.textContent = group.label;
+            section.appendChild(heading);
 
-            const title = document.createElement('h3');
-            title.textContent = item.name || 'Unnamed item';
-            top.appendChild(title);
+            group.items.forEach((item) => {
+                const lineTotal = (item.price || 0) * (item.qty || 1);
 
-            const qty = document.createElement('div');
-            qty.className = 'checkout-item-qty';
-            qty.textContent = `x${item.qty || 1}`;
-            top.appendChild(qty);
+                const card = document.createElement('div');
+                card.className = 'checkout-item-card';
 
-            const desc = document.createElement('p');
-            desc.className = 'checkout-item-description';
-            desc.textContent = `${formatCurrency(item.price || 0)} each — ${formatCurrency(lineTotal)}`;
+                const top = document.createElement('div');
+                top.className = 'checkout-item-topline';
 
-            card.appendChild(top);
-            card.appendChild(desc);
+                const title = document.createElement('h4');
+                title.textContent = item.name || 'Unnamed item';
+                top.appendChild(title);
 
-            orderItemsEl.appendChild(card);
+                const qty = document.createElement('div');
+                qty.className = 'checkout-item-qty';
+                qty.textContent = `x${item.qty || 1}`;
+                top.appendChild(qty);
+
+                const desc = document.createElement('p');
+                desc.className = 'checkout-item-description';
+                desc.textContent = `${formatCurrency(item.price || 0)} each — ${formatCurrency(lineTotal)}`;
+
+                card.appendChild(top);
+                card.appendChild(desc);
+                section.appendChild(card);
+            });
+
+            orderItemsEl.appendChild(section);
         });
 
         const totals = calculateOrderTotals(cart);
@@ -127,7 +194,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         if (restaurantMixNote) {
             restaurantMixNote.textContent = totals.additionalRestaurants > 0
-                ? `Includes ${totals.additionalRestaurants} extra delivery fee${totals.additionalRestaurants === 1 ? '' : 's'} for ordering from multiple restaurants.`
+                ? `Extra multi-restaurant fee scales with each added restaurant (${totals.additionalRestaurants} additional).`
                 : 'Ordering from one restaurant only, so no extra multi-restaurant fee applies.';
         }
         totalEl.textContent = formatCurrency(totals.total);

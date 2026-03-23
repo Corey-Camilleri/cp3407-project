@@ -93,9 +93,15 @@
             const safePrice = Number(currentItem.price || 0);
             const fallbackRestaurantId = new URLSearchParams(window.location.search).get('restaurantId');
             const safeRestaurantId = Number(currentItem.restaurantId || fallbackRestaurantId || 0);
+            const profileHeading = document.querySelector('.restaurant-profile-text h2') || document.querySelector('#restaurantProfile h2');
+            const fallbackRestaurantName = profileHeading ? String(profileHeading.textContent || '').trim() : '';
+            const safeRestaurantName = String(currentItem.restaurantName || fallbackRestaurantName || '').trim();
             const existingIndex = cart.findIndex((entry) => {
                 const entryRestaurantId = Number(entry && entry.restaurantId ? entry.restaurantId : 0);
-                const sameRestaurant = safeRestaurantId > 0 ? entryRestaurantId === safeRestaurantId : true;
+                const entryRestaurantName = String(entry && entry.restaurantName ? entry.restaurantName : '').trim().toLowerCase();
+                const sameRestaurant = safeRestaurantId > 0
+                    ? entryRestaurantId === safeRestaurantId
+                    : (safeRestaurantName ? entryRestaurantName === safeRestaurantName.toLowerCase() : true);
                 const sameId = itemId > 0 && Number(entry && entry.id ? entry.id : 0) === itemId && sameRestaurant;
                 const sameFallback = String(entry && entry.name ? entry.name : '') === safeName
                     && Number(entry && entry.price ? entry.price : 0) === safePrice
@@ -109,12 +115,16 @@
                 if (safeRestaurantId > 0 && Number(cart[existingIndex].restaurantId || 0) <= 0) {
                     cart[existingIndex].restaurantId = safeRestaurantId;
                 }
+                if (safeRestaurantName && !String(cart[existingIndex].restaurantName || '').trim()) {
+                    cart[existingIndex].restaurantName = safeRestaurantName;
+                }
             } else {
                 cart.push({
                     id: itemId > 0 ? itemId : undefined,
                     name: safeName,
                     price: safePrice,
                     restaurantId: safeRestaurantId > 0 ? safeRestaurantId : undefined,
+                    restaurantName: safeRestaurantName || undefined,
                     qty: 1
                 });
             }
