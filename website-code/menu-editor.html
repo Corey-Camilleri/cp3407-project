@@ -25,6 +25,8 @@
                 <button id="editModeButton" class="primary-link" type="button">Edit Menu</button>
                 <div id="editActions" class="menu-editor-action-row" hidden>
                     <button id="openAddOverlayButton" class="refresh-button" type="button">Add</button>
+                    <button id="openDiscountOverlayButton" class="refresh-button" type="button">Discount</button>
+                    <button id="openBundleOverlayButton" class="refresh-button" type="button">Bundle</button>
                 </div>
             </div>
 
@@ -70,6 +72,80 @@
                     <button id="saveItemButton" class="primary-link" type="submit" hidden>Save changes</button>
                 </div>
             </form>
+        </div>
+    </section>
+
+    <section id="discountOverlay" class="menu-editor-overlay" hidden>
+        <div class="menu-editor-overlay-card menu-editor-overlay-card-large">
+            <div class="menu-editor-overlay-header">
+                <h2>Discount</h2>
+                <button type="button" class="menu-editor-close" data-close-overlay="discountOverlay">✕</button>
+            </div>
+
+            <form id="discountForm" class="menu-editor-form">
+                <label>Discount name<input id="discountName" type="text" required></label>
+
+                <div id="discountTypeGroup" class="discount-config-group">
+                    <label>Type
+                        <select id="discountType" required>
+                            <option value="item">Single item</option>
+                            <option value="category">Category</option>
+                        </select>
+                    </label>
+                </div>
+
+                <div id="discountItemGroup" class="discount-config-group">
+                    <label>Item
+                        <select id="discountItem"></select>
+                    </label>
+                </div>
+
+                <div id="discountCategoryGroup" class="discount-config-group" hidden>
+                    <label>Category
+                        <select id="discountCategory"></select>
+                    </label>
+                </div>
+
+                <div id="discountPercentGroup" class="discount-config-group">
+                    <label>Discount percent (%)<input id="discountPercent" type="number" min="0" max="100" step="0.01"></label>
+                </div>
+
+                <button class="primary-link" type="submit">Save discount</button>
+            </form>
+
+            <div>
+                <p class="section-label">Saved</p>
+                <div id="discountList" class="menu-display-list"></div>
+            </div>
+        </div>
+    </section>
+
+    <section id="bundleOverlay" class="menu-editor-overlay" hidden>
+        <div class="menu-editor-overlay-card menu-editor-overlay-card-large">
+            <div class="menu-editor-overlay-header">
+                <h2>Bundle</h2>
+                <button type="button" class="menu-editor-close" data-close-overlay="bundleOverlay">✕</button>
+            </div>
+
+            <form id="bundleForm" class="menu-editor-form">
+                <label>Bundle name<input id="bundleName" type="text" required></label>
+
+                <div class="discount-config-group">
+                    <p class="section-label">Bundle items</p>
+                    <div id="bundleItems" class="discount-item-checklist"></div>
+                </div>
+
+                <div class="discount-config-group">
+                    <label>Bundle price ($)<input id="bundlePrice" type="number" min="0" step="0.01" required></label>
+                </div>
+
+                <button class="primary-link" type="submit">Save bundle</button>
+            </form>
+
+            <div>
+                <p class="section-label">Saved</p>
+                <div id="bundleList" class="menu-display-list"></div>
+            </div>
         </div>
     </section>
 

@@ -422,6 +422,48 @@ h3 {
 	background: #fff;
 }
 
+.discount-config-group {
+	display: grid;
+	gap: 8px;
+}
+
+.discount-config-group[hidden] {
+	display: none !important;
+}
+
+.discount-item-checklist {
+	display: grid;
+	gap: 8px;
+	max-height: 180px;
+	overflow: auto;
+	padding: 8px;
+	border: 1px solid rgba(75, 95, 78, 0.2);
+	border-radius: 10px;
+	background: #fff;
+}
+
+.discount-check-row {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	font-weight: 700;
+	color: var(--ink);
+}
+
+.menu-editor-form label.discount-check-row {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+}
+
+.discount-check-row input[type="checkbox"] {
+	width: auto;
+	min-width: 16px;
+	height: 16px;
+	padding: 0;
+	margin: 0;
+}
+
 .restaurant-info-strip {
 	align-items: stretch;
 }
@@ -968,7 +1010,8 @@ h3 {
 	gap: 6px;
 }
 
-.menu-editor-form input,
+.menu-editor-form input:not([type="checkbox"]),
+.menu-editor-form select,
 .menu-editor-form textarea {
 	width: 100%;
 	padding: 10px 12px;
@@ -976,6 +1019,12 @@ h3 {
 	border: 1px solid rgba(75, 95, 78, 0.2);
 	font: inherit;
 	background: #fff;
+}
+
+.menu-editor-form input[type="checkbox"] {
+	width: auto;
+	padding: 0;
+	margin: 0;
 }
 
 .menu-editor-overlay-actions {
