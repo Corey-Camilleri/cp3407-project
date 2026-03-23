@@ -427,6 +427,10 @@ h3 {
 	gap: 8px;
 }
 
+.discount-config-group[hidden] {
+	display: none !important;
+}
+
 .discount-item-checklist {
 	display: grid;
 	gap: 8px;
