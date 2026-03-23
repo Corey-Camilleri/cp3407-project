@@ -78,7 +78,7 @@
     <section id="discountOverlay" class="menu-editor-overlay" hidden>
         <div class="menu-editor-overlay-card menu-editor-overlay-card-large">
             <div class="menu-editor-overlay-header">
-                <h2 id="discountBuilderHeading">Discount builder</h2>
+                <h2 id="discountBuilderHeading">Discount</h2>
                 <button type="button" class="menu-editor-close" data-close-overlay="discountOverlay">✕</button>
             </div>
 
@@ -86,7 +86,7 @@
                 <label>Discount name<input id="discountName" type="text" required></label>
 
                 <div id="discountTypeGroup" class="discount-config-group">
-                    <label>Discount applies to
+                    <label>Type
                         <select id="discountType" required>
                             <option value="item">Single item</option>
                             <option value="category">Category</option>
@@ -111,12 +111,6 @@
                     <div id="discountBundleItems" class="discount-item-checklist"></div>
                 </div>
 
-                <div id="discountAlternativesGroup" class="discount-config-group">
-                    <label>Alternatives (swap options)
-                        <select id="discountAlternatives" multiple size="5"></select>
-                    </label>
-                </div>
-
                 <div id="discountPercentGroup" class="discount-config-group">
                     <label>Discount percent (%)<input id="discountPercent" type="number" min="0" max="100" step="0.01"></label>
                 </div>
@@ -129,7 +123,7 @@
             </form>
 
             <div>
-                <p class="section-label">Saved discounts</p>
+                <p class="section-label">Saved</p>
                 <div id="discountList" class="menu-display-list"></div>
             </div>
         </div>

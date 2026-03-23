@@ -37,7 +37,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const discountItemSelect = document.getElementById('discountItem');
     const discountCategorySelect = document.getElementById('discountCategory');
     const discountBundleItems = document.getElementById('discountBundleItems');
-    const discountAlternativesSelect = document.getElementById('discountAlternatives');
     const discountPercentInput = document.getElementById('discountPercent');
     const discountBundlePriceInput = document.getElementById('discountBundlePrice');
     const discountList = document.getElementById('discountList');
@@ -183,9 +182,20 @@ document.addEventListener('DOMContentLoaded', () => {
         return grouped;
     }
 
+    function inferCategoryLabel(item) {
+        const explicit = (item?.category || '').trim();
+        if (explicit) {
+            return explicit;
+        }
+
+        const haystack = `${item?.name || ''} ${item?.description || ''}`;
+        const matched = categoryRules.find((rule) => rule.pattern.test(haystack));
+        return matched ? matched.label : 'More';
+    }
+
     function getAvailableCategories() {
         const categories = menuItems
-            .map((item) => (item.category || '').trim())
+            .map((item) => inferCategoryLabel(item))
             .filter((category) => Boolean(category));
 
         return Array.from(new Set(categories)).sort((left, right) => left.localeCompare(right));
@@ -196,20 +206,12 @@ document.addEventListener('DOMContentLoaded', () => {
         return match ? match.name : `Item #${itemId}`;
     }
 
-    function getSelectedValues(selectElement) {
-        return Array.from(selectElement?.selectedOptions || []).map((option) => Number(option.value));
-    }
-
     function populateDiscountSelectors() {
-        if (!discountItemSelect || !discountCategorySelect || !discountAlternativesSelect || !discountBundleItems) {
+        if (!discountItemSelect || !discountCategorySelect || !discountBundleItems) {
             return;
         }
 
         discountItemSelect.innerHTML = menuItems
-            .map((item) => `<option value="${item.id}">${item.name}</option>`)
-            .join('');
-
-        discountAlternativesSelect.innerHTML = menuItems
             .map((item) => `<option value="${item.id}">${item.name}</option>`)
             .join('');
 
@@ -260,7 +262,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         if (discountBuilderHeading) {
-            discountBuilderHeading.textContent = discountOverlayMode === 'bundle' ? 'Bundle builder' : 'Discount builder';
+            discountBuilderHeading.textContent = discountOverlayMode === 'bundle' ? 'Bundle' : 'Discount';
         }
     }
 
@@ -304,7 +306,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     scopeLabel = `Bundle: ${names.join(', ')}`;
                 }
 
-                const altNames = (discount.alternativeItemIds || []).map((itemId) => getItemNameById(itemId));
                 const ruleLabel = discount.type === 'bundle'
                     ? `Bundle price: $${formatPrice(discount.bundlePrice)}`
                     : `Discount: ${formatPrice(discount.percent)}%`;
@@ -315,7 +316,6 @@ document.addEventListener('DOMContentLoaded', () => {
                             <h3>${discount.name}</h3>
                             <p>${scopeLabel}</p>
                             <p>${ruleLabel}</p>
-                            <p>${altNames.length ? `Alternatives: ${altNames.join(', ')}` : 'Alternatives: None'}</p>
                         </div>
                         <div class="menu-display-meta">
                             <button class="menu-remove-submit" type="button" data-remove-discount-id="${discount.id}">Remove</button>
@@ -536,7 +536,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 imageUrl: item.imageUrl || '',
                 price: Number(item.price || 0),
                 restaurantId: Number(item.restaurantId || restaurantId),
-                category: ''
+                category: item.category || inferCategoryLabel(item)
             }));
 
             saveMenuToStorage();
@@ -626,7 +626,7 @@ document.addEventListener('DOMContentLoaded', () => {
             event.preventDefault();
 
             const name = addItemName.value.trim();
-            const category = addItemCategory.value.trim();
+            const enteredCategory = addItemCategory.value.trim();
             const description = addItemDescription.value.trim();
             const imageUrl = addItemImage.value.trim();
             const price = Number(addItemPrice.value);
@@ -636,6 +636,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             const nextId = menuItems.reduce((max, item) => Math.max(max, Number(item.id || 0)), 0) + 1;
+            const category = enteredCategory || inferCategoryLabel({ name, description, category: '' });
             menuItems.push({
                 id: nextId,
                 name,
@@ -710,7 +711,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 : (discountTypeSelect ? discountTypeSelect.value : 'item');
             const percent = Number(discountPercentInput ? discountPercentInput.value : 0);
             const bundlePrice = Number(discountBundlePriceInput ? discountBundlePriceInput.value : 0);
-            const alternatives = getSelectedValues(discountAlternativesSelect);
 
             if (!name) {
                 return;
@@ -719,8 +719,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const discountRecord = {
                 id: Date.now(),
                 name,
-                type,
-                alternativeItemIds: alternatives
+                type
             };
 
             if (type === 'item') {
