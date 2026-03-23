@@ -45,10 +45,14 @@ function loadSession() {
 }
 
 const activeSession = loadSession();
-const roleSource = String(params.get('role') || (activeSession && activeSession.role) || 'owner').toLowerCase();
+const sessionRole = String(activeSession && activeSession.role ? activeSession.role : '').toLowerCase();
+const isOwnerSession = sessionRole === 'owner';
+const isAdminSession = sessionRole === 'admin';
+const isAuthorizedOperator = isOwnerSession || isAdminSession;
+const roleSource = String(params.get('role') || (isAuthorizedOperator ? sessionRole : '')).toLowerCase();
 const operatorRole = roleSource === 'admin' ? 'Admin' : 'Owner';
-const requestedAccountId = Number(params.get('accountId') || (operatorRole === 'Owner' ? 1 : 0));
-const ownerFallbackAccountId = Number(params.get('accountId') || 1);
+const requestedAccountId = Number(params.get('accountId') || (activeSession && activeSession.accountId) || (operatorRole === 'Owner' ? 1 : 0));
+const ownerFallbackAccountId = Number(params.get('accountId') || (activeSession && activeSession.accountId) || 1);
 
 let restaurants = [];
 let accounts = [];
@@ -270,6 +274,25 @@ function renderManagedRestaurantsSection() {
 }
 
 function renderAccountProfile() {
+  const personName = activeSession && activeSession.fullName ? activeSession.fullName : 'Guest user';
+  const personEmail = activeSession && activeSession.email ? activeSession.email : 'No session email';
+  const personRole = sessionRole
+    ? String(sessionRole).charAt(0).toUpperCase() + String(sessionRole).slice(1)
+    : '-';
+
+  if (!isAuthorizedOperator) {
+    accountName.textContent = personName;
+    accountSummary.textContent = `Profile only. ${personRole === '-' ? 'Please log in as an owner or admin to manage restaurants.' : `${personRole} accounts cannot manage restaurants.`}`;
+    accountRole.textContent = personRole;
+    accountRestaurantCount.textContent = '0';
+    accountBrandCount.textContent = '0';
+
+    if (adminTestButton) {
+      adminTestButton.hidden = true;
+    }
+    return;
+  }
+
   if (!activeAccount) {
     accountName.textContent = 'Account profile';
     accountSummary.textContent = 'No account loaded yet.';
@@ -280,12 +303,6 @@ function renderAccountProfile() {
   }
 
   const groupedBrands = groupByBrand(activeAccount.restaurants);
-  const personName = activeSession && activeSession.fullName ? activeSession.fullName : 'Guest user';
-  const personEmail = activeSession && activeSession.email ? activeSession.email : 'No session email';
-  const personRole = activeSession && activeSession.role
-    ? String(activeSession.role).charAt(0).toUpperCase() + String(activeSession.role).slice(1)
-    : operatorRole;
-
   accountName.textContent = personName;
   accountSummary.textContent = `${personRole} • ${personEmail}`;
   accountRole.textContent = operatorRole;
@@ -322,7 +339,7 @@ function bindManagedRestaurantActions() {
 }
 
 function bindAdminTestAction() {
-  if (!adminTestButton) {
+  if (!adminTestButton || !isAuthorizedOperator) {
     return;
   }
 
@@ -379,6 +396,10 @@ function selectActiveAccount(allAccounts) {
     };
   }
 
+  if (isOwnerSession && activeSession && Number(activeSession.accountId) > 0) {
+    return allAccounts.find((entry) => Number(entry.accountId) === Number(activeSession.accountId)) || null;
+  }
+
   const byRequest = requestedAccountId > 0
     ? allAccounts.find((entry) => Number(entry.accountId) === requestedAccountId)
     : null;
@@ -389,6 +410,16 @@ function selectActiveAccount(allAccounts) {
 async function loadRestaurants() {
   restaurantStatus.textContent = 'Loading restaurant list...';
   setDashboardVisible(false);
+
+  if (!isAuthorizedOperator) {
+    restaurantStatus.textContent = 'Restaurant home is available to owner/admin accounts only.';
+    restaurantMenuDisplay.innerHTML = '';
+    renderAccountProfile();
+    if (managedRestaurantsSections) {
+      managedRestaurantsSections.innerHTML = '';
+    }
+    return;
+  }
 
   try {
     const response = await fetch('/api/restaurants');
