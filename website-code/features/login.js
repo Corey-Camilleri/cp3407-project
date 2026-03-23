@@ -10,6 +10,13 @@ document.addEventListener('DOMContentLoaded', () => {
     function getDefaultAccounts() {
         return [
             {
+                id: 101,
+                fullName: 'Casey Customer',
+                email: 'customer@feedme.test',
+                password: 'password123',
+                role: 'customer'
+            },
+            {
                 id: 1,
                 fullName: 'Owner One',
                 email: 'owner1@feedme.test',
