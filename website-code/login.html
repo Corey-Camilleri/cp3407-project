@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FeedMe | Login</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <main class="page-shell">
+        <header class="topbar">
+            <div>
+                <p class="brand-mark">FeedMe</p>
+                <p class="brand-subtitle">Sign in to continue as customer, owner, or admin.</p>
+            </div>
+            <nav class="topnav" aria-label="Primary navigation">
+                <a href="index.html">Customer home</a>
+                <a href="restaurant-home.html">Restaurant home</a>
+            </nav>
+        </header>
+
+        <section class="hero">
+            <p class="eyebrow">Authentication</p>
+            <h1>Login</h1>
+            <p class="hero-copy">Use your FeedMe account details to sign in.</p>
+        </section>
+
+        <section class="list-panel">
+            <div class="panel-header">
+                <div>
+                    <p class="section-label">Sign in</p>
+                    <h2>Account access</h2>
+                    <p class="panel-copy">If no local test accounts exist yet, demo accounts are preloaded automatically.</p>
+                </div>
+            </div>
+
+            <form id="loginForm" class="menu-editor-form">
+                <label>Email<input id="loginEmail" type="email" required placeholder="you@example.com"></label>
+                <label>Password<input id="loginPassword" type="password" required placeholder="Your password"></label>
+                <button class="primary-link" type="submit">Login</button>
+            </form>
+
+            <p id="loginMessage" class="status-message"></p>
+
+            <div class="feature-card">
+                <p class="section-label">Demo accounts</p>
+                <p><strong>Owner:</strong> owner1@feedme.test / password123</p>
+                <p><strong>Admin:</strong> admin@feedme.test / password123</p>
+            </div>
+        </section>
+    </main>
+
+    <script src="features/login.js"></script>
+</body>
+</html>
