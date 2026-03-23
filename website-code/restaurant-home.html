@@ -5,24 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FeedMe | Restaurant Home</title>
     <link rel="stylesheet" href="style.css">
-    <style>
-        /* Boxed selector styling */
-        .selector-row{
-            background:#fff;
-            border:1px solid #e6eef8;
-            border-radius:10px;
-            padding:14px 16px;
-            box-shadow:0 8px 20px rgba(11,20,50,0.04);
-            margin-top:12px;
-        }
-        .selector-row{color:#000;font-size:13px}
-        .selector-row .field-label{margin:0 0 8px 0;font-weight:600;color:#000;font-size:13px}
-        .selector-controls{display:flex;gap:10px;align-items:center}
-        .selector-controls select{flex:1;min-width:0;height:40px;padding:6px 8px;border-radius:8px;border:1px solid #dbeafe;background:#fbfdff;color:#000;font-size:13px}
-        .selector-controls select option{color:#000;font-size:13px}
-        .selector-controls select{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-        .selector-controls .secondary-link{display:inline-flex;align-items:center;height:40px;padding:6px 12px;border-radius:8px;background:#eef2ff;color:#000;text-decoration:none;border:1px solid #dbeafe;font-size:13px}
-    </style>
 </head>
 <body>
     <main class="page-shell">
@@ -49,13 +31,17 @@
                 <p><strong>Role:</strong> <span id="accountRole">-</span></p>
                 <p><strong>Managed restaurants:</strong> <span id="accountRestaurantCount">0</span></p>
                 <p><strong>Managed brands:</strong> <span id="accountBrandCount">0</span></p>
+                <div class="access-actions">
+                    <button id="adminTestButton" class="refresh-button" type="button">Admin test</button>
+                    <a class="secondary-link" href="add_restaurant_profile.html" title="Create or edit restaurant profile">Create / Edit Profile</a>
+                </div>
             </article>
         </section>
 
-        <section class="hero restaurant-hero" id="dashboard">
+        <section class="hero restaurant-hero" id="dashboard" hidden>
             <div class="hero-copy-block">
                 <p class="eyebrow">Restaurant workspace</p>
-                <h1>Manage your restaurant portfolio.</h1>
+                <h1 id="dashboardRestaurantName">Select a branch to open dashboard</h1>
                 <p class="hero-copy">
                     Owners/admins can manage multiple restaurants under one account, including branches with the same restaurant name in different locations.
                 </p>
@@ -71,29 +57,11 @@
                 </div>
             </div>
 
+            <p id="restaurantStatus" class="status-message">Loading restaurant data...</p>
             <div id="managedRestaurantsSections" class="managed-restaurants-sections"></div>
         </section>
 
-        <section class="list-panel">
-            <div class="panel-header">
-                <div>
-                    <p class="section-label">Branch selector</p>
-                    <h2>Select branch</h2>
-                    <p class="panel-copy">Choose the branch to load for stats and menu display.</p>
-                </div>
-            </div>
-
-            <div class="selector-row">
-                <label class="field-label" for="restaurantSelector">Select branch</label>
-                <div class="selector-controls" style="display:flex;gap:10px;align-items:center">
-                    <select id="restaurantSelector" class="field-control" style="min-width:260px"></select>
-                    <a class="secondary-link" href="add_restaurant_profile.html" title="Create or edit restaurant profile">Create / Edit Profile</a>
-                </div>
-                <p id="restaurantStatus" class="status-message">Loading restaurant data...</p>
-            </div>
-        </section>
-
-        <section class="list-panel">
+        <section class="list-panel" id="dashboardStats" hidden>
             <div class="panel-header">
                 <div>
                     <p class="section-label">Stats</p>
@@ -126,7 +94,7 @@
             </aside>
         </section>
 
-        <section class="feature-strip restaurant-info-strip">
+        <section class="feature-strip restaurant-info-strip" id="dashboardBranchProfile" hidden>
             <article class="feature-card">
                 <p class="section-label">Location and reach</p>
                 <p><strong>Branch:</strong> <span id="profileName">-</span></p>
@@ -137,16 +105,15 @@
             </article>
         </section>
 
-        <section id="menu-display" class="list-panel">
+        <section id="menu-display" class="list-panel" hidden>
             <div class="panel-header">
                 <div>
                     <p class="section-label">Menu display</p>
-                    <h2>Restaurant menu (same as customer menu)</h2>
-                    <p class="panel-copy">This section is a restaurant-side view of the customer menu. Menu editor actions are linked below.</p>
+                    <h2>Restaurant menu</h2>
+                    <p class="panel-copy">Menu editor actions for the selected branch.</p>
                 </div>
                 <div class="hero-actions">
-                    <a class="primary-link" href="view_menu.html">Open customer menu page</a>
-                    <a id="menuEditorLink" class="secondary-link" href="menu-editor.html">Open menu editor</a>
+                    <a id="menuEditorLink" class="primary-link" href="menu-editor.html">Open menu editor</a>
                 </div>
             </div>
 

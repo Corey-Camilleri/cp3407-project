@@ -1448,6 +1448,27 @@ h3 {
 	padding: 9px 12px;
 }
 
+.access-actions {
+	margin-top: 10px;
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+}
+
+.access-actions .refresh-button {
+	padding: 9px 12px;
+}
+
+.access-actions .secondary-link {
+	padding: 10px 14px;
+	border: 1px solid rgba(36, 66, 47, 0.2);
+	border-radius: 999px;
+	background: #fffefb;
+	color: var(--ink);
+	font-weight: 700;
+	text-decoration: none;
+}
+
 @media (max-width: 640px) {
 	.page-shell {
 		width: min(100% - 20px, 1100px);

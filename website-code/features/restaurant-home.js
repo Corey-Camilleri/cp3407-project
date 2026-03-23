@@ -1,8 +1,14 @@
-const restaurantSelector = document.getElementById('restaurantSelector');
 const restaurantStatus = document.getElementById('restaurantStatus');
 const restaurantMenuDisplay = document.getElementById('restaurantMenuDisplay');
 const menuEditorLink = document.getElementById('menuEditorLink');
 const managedRestaurantsSections = document.getElementById('managedRestaurantsSections');
+const adminTestButton = document.getElementById('adminTestButton');
+
+const dashboardSection = document.getElementById('dashboard');
+const dashboardStatsSection = document.getElementById('dashboardStats');
+const dashboardBranchProfile = document.getElementById('dashboardBranchProfile');
+const menuDisplaySection = document.getElementById('menu-display');
+const dashboardRestaurantName = document.getElementById('dashboardRestaurantName');
 
 const accountName = document.getElementById('accountName');
 const accountSummary = document.getElementById('accountSummary');
@@ -26,6 +32,7 @@ const operatorRole = String(params.get('role') || 'owner').toLowerCase() === 'ad
 const requestedAccountId = Number(params.get('accountId') || 0);
 
 let restaurants = [];
+let accounts = [];
 let activeAccount = null;
 
 function toCurrency(value) {
@@ -137,6 +144,14 @@ function renderBranchProfile(restaurant) {
   profileStatus.textContent = restaurant.status || 'Unknown';
 }
 
+function setDashboardVisible(visible) {
+  [dashboardSection, dashboardStatsSection, dashboardBranchProfile, menuDisplaySection].forEach((section) => {
+    if (section) {
+      section.hidden = !visible;
+    }
+  });
+}
+
 function renderStats(restaurant, menuItemsCount) {
   const stats = computeStats(restaurant.id, menuItemsCount);
   ordersToday.textContent = String(stats.orders);
@@ -185,11 +200,12 @@ function renderSelectedRestaurant(restaurantId) {
     menuEditorLink.href = `menu-editor.html?restaurantId=${encodeURIComponent(restaurant.id)}`;
   }
 
-  if (restaurantSelector) {
-    restaurantSelector.value = String(restaurant.id);
+  const menuItems = getMenuDisplayItems(String(restaurant.id));
+  if (dashboardRestaurantName) {
+    dashboardRestaurantName.textContent = getBranchDisplayName(restaurant);
   }
 
-  const menuItems = getMenuDisplayItems(String(restaurant.id));
+  setDashboardVisible(true);
   renderBranchProfile(restaurant);
   renderStats(restaurant, menuItems.filter((item) => item.available).length);
   renderMenuDisplay(restaurant);
@@ -252,20 +268,14 @@ function renderAccountProfile() {
   accountRole.textContent = operatorRole;
   accountRestaurantCount.textContent = String(activeAccount.restaurants.length);
   accountBrandCount.textContent = String(groupedBrands.length);
-}
 
-function populateSelector() {
-  if (!restaurantSelector || !activeAccount) {
-    return;
+  if (adminTestButton) {
+    if (operatorRole === 'Admin') {
+      adminTestButton.textContent = `Admin test: switch account (${activeAccount.accountId})`;
+    } else {
+      adminTestButton.textContent = 'Admin test mode';
+    }
   }
-
-  restaurantSelector.innerHTML = activeAccount.restaurants
-    .map((restaurant) => `<option value="${restaurant.id}">${getBranchDisplayName(restaurant)}</option>`)
-    .join('');
-
-  restaurantSelector.addEventListener('change', (event) => {
-    renderSelectedRestaurant(event.target.value);
-  });
 }
 
 function bindManagedRestaurantActions() {
@@ -285,6 +295,27 @@ function bindManagedRestaurantActions() {
     }
 
     renderSelectedRestaurant(branchId);
+  });
+}
+
+function bindAdminTestAction() {
+  if (!adminTestButton) {
+    return;
+  }
+
+  adminTestButton.addEventListener('click', () => {
+    if (!accounts.length) {
+      return;
+    }
+
+    const currentIndex = accounts.findIndex((entry) => activeAccount && Number(entry.accountId) === Number(activeAccount.accountId));
+    const nextIndex = currentIndex >= 0 ? (currentIndex + 1) % accounts.length : 0;
+    const nextAccount = accounts[nextIndex];
+
+    const nextParams = new URLSearchParams(window.location.search);
+    nextParams.set('role', 'admin');
+    nextParams.set('accountId', String(nextAccount.accountId));
+    window.location.search = nextParams.toString();
   });
 }
 
@@ -321,6 +352,7 @@ function selectActiveAccount(allAccounts) {
 
 async function loadRestaurants() {
   restaurantStatus.textContent = 'Loading restaurant list...';
+  setDashboardVisible(false);
 
   try {
     const response = await fetch('/api/restaurants');
@@ -341,7 +373,7 @@ async function loadRestaurants() {
       return;
     }
 
-    const accounts = buildAccounts(restaurants);
+    accounts = buildAccounts(restaurants);
     activeAccount = selectActiveAccount(accounts);
 
     if (!activeAccount) {
@@ -351,12 +383,12 @@ async function loadRestaurants() {
 
     renderAccountProfile();
     renderManagedRestaurantsSection();
-    populateSelector();
-    renderSelectedRestaurant(activeAccount.restaurants[0].id);
+    restaurantStatus.textContent = 'Select a branch from Managed restaurants and click Open dashboard.';
   } catch (error) {
     restaurantStatus.textContent = error.message;
   }
 }
 
 bindManagedRestaurantActions();
+bindAdminTestAction();
 loadRestaurants();
