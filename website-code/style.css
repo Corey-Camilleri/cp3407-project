@@ -1396,6 +1396,58 @@ h3 {
 	text-decoration: underline;
 }
 
+.managed-restaurants-sections {
+	display: grid;
+	gap: 16px;
+}
+
+.managed-brand-group {
+	border: 1px solid rgba(75, 95, 78, 0.12);
+	border-radius: 16px;
+	padding: 14px;
+	background: #fffefb;
+	display: grid;
+	gap: 10px;
+}
+
+.managed-brand-group h3 {
+	margin: 0;
+	font-size: 1.1rem;
+	color: var(--deep-green);
+}
+
+.managed-branch-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+	gap: 10px;
+}
+
+.managed-branch-card {
+	border: 1px solid rgba(75, 95, 78, 0.14);
+	border-radius: 12px;
+	padding: 12px;
+	background: #ffffff;
+	display: grid;
+	gap: 8px;
+}
+
+.managed-branch-card h4 {
+	margin: 0;
+	font-size: 1rem;
+	color: var(--ink);
+}
+
+.managed-branch-card p {
+	margin: 0;
+	color: var(--muted);
+	font-size: 0.9rem;
+}
+
+.managed-branch-card .refresh-button {
+	justify-self: start;
+	padding: 9px 12px;
+}
+
 @media (max-width: 640px) {
 	.page-shell {
 		width: min(100% - 20px, 1100px);

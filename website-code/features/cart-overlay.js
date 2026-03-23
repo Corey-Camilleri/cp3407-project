@@ -1,4 +1,6 @@
 (function () {
+    let restaurantLabelById = new Map();
+
     function loadCart() {
         try {
             const raw = localStorage.getItem('cart');
@@ -56,7 +58,7 @@
 
         const restaurantId = Number(item && item.restaurantId ? item.restaurantId : 0);
         if (restaurantId > 0) {
-            return `Restaurant #${restaurantId}`;
+            return restaurantLabelById.get(restaurantId) || `Restaurant #${restaurantId}`;
         }
 
         return 'Restaurant';
@@ -78,6 +80,59 @@
         });
 
         return Array.from(grouped.values());
+    }
+
+    async function loadRestaurantLabels() {
+        try {
+            const response = await fetch('/api/restaurants');
+            if (!response.ok) {
+                return;
+            }
+
+            const restaurants = await response.json();
+            if (!Array.isArray(restaurants)) {
+                return;
+            }
+
+            const nameCounts = new Map();
+            restaurants.forEach((restaurant) => {
+                const name = String(restaurant && restaurant.name ? restaurant.name : '').trim();
+                if (!name) {
+                    return;
+                }
+
+                const key = name.toLowerCase();
+                nameCounts.set(key, Number(nameCounts.get(key) || 0) + 1);
+            });
+
+            const nextMap = new Map();
+            restaurants.forEach((restaurant) => {
+                const id = Number(restaurant && restaurant.id ? restaurant.id : 0);
+                if (id <= 0) {
+                    return;
+                }
+
+                const name = String(restaurant && restaurant.name ? restaurant.name : '').trim() || `Restaurant #${id}`;
+                const duplicateCount = Number(nameCounts.get(name.toLowerCase()) || 0);
+                const location = String(
+                    restaurant.location
+                    || restaurant.address
+                    || restaurant.suburb
+                    || restaurant.city
+                    || ''
+                ).trim();
+
+                if (duplicateCount > 1) {
+                    nextMap.set(id, `${name} — ${location || `Branch #${id}`}`);
+                } else {
+                    nextMap.set(id, name);
+                }
+            });
+
+            restaurantLabelById = nextMap;
+        } catch (error) {
+            restaurantLabelById = new Map();
+        }
     }
 
     function ensureNav() {
@@ -257,6 +312,12 @@
 
         const state = buildOverlay();
         updateBadge(iconButton);
+
+        loadRestaurantLabels().then(() => {
+            if (state.panel.classList.contains('is-open')) {
+                renderOverlay(state);
+            }
+        });
 
         iconButton.addEventListener('click', () => {
             const open = !state.panel.classList.contains('is-open');

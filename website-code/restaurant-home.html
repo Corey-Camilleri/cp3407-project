@@ -40,33 +40,51 @@
 
         <section class="feature-strip restaurant-info-strip">
             <article class="feature-card">
-                <p class="section-label">Profile</p>
-                <h2 id="profileName">Restaurant profile</h2>
-                <p id="profileDescription">No profile loaded yet.</p>
+                <p class="section-label">Owner/Admin Profile</p>
+                <h2 id="accountName">Account profile</h2>
+                <p id="accountSummary">No account loaded yet.</p>
+            </article>
+            <article class="feature-card">
+                <p class="section-label">Access</p>
+                <p><strong>Role:</strong> <span id="accountRole">-</span></p>
+                <p><strong>Managed restaurants:</strong> <span id="accountRestaurantCount">0</span></p>
+                <p><strong>Managed brands:</strong> <span id="accountBrandCount">0</span></p>
             </article>
         </section>
 
         <section class="hero restaurant-hero" id="dashboard">
             <div class="hero-copy-block">
                 <p class="eyebrow">Restaurant workspace</p>
-                <h1>View earnings of all restaurants.</h1>
+                <h1>Manage your restaurant portfolio.</h1>
                 <p class="hero-copy">
-                    Review profile, choose a restaurant, and view operational statistics with menu context.
+                    Owners/admins can manage multiple restaurants under one account, including branches with the same restaurant name in different locations.
                 </p>
             </div>
+        </section>
+
+        <section class="list-panel" id="managed-restaurants">
+            <div class="panel-header">
+                <div>
+                    <p class="section-label">Managed restaurants</p>
+                    <h2>Brands and branches</h2>
+                    <p class="panel-copy">Restaurants are organised by brand name. Branches can share the same name and are separated by location/branch label.</p>
+                </div>
+            </div>
+
+            <div id="managedRestaurantsSections" class="managed-restaurants-sections"></div>
         </section>
 
         <section class="list-panel">
             <div class="panel-header">
                 <div>
-                    <p class="section-label">Restaurant selector</p>
-                    <h2>Select restaurant</h2>
-                    <p class="panel-copy">Choose which restaurant to load for stats and menu display.</p>
+                    <p class="section-label">Branch selector</p>
+                    <h2>Select branch</h2>
+                    <p class="panel-copy">Choose the branch to load for stats and menu display.</p>
                 </div>
             </div>
 
             <div class="selector-row">
-                <label class="field-label" for="restaurantSelector">Select restaurant</label>
+                <label class="field-label" for="restaurantSelector">Select branch</label>
                 <div class="selector-controls" style="display:flex;gap:10px;align-items:center">
                     <select id="restaurantSelector" class="field-control" style="min-width:260px"></select>
                     <a class="secondary-link" href="add_restaurant_profile.html" title="Create or edit restaurant profile">Create / Edit Profile</a>
@@ -111,6 +129,8 @@
         <section class="feature-strip restaurant-info-strip">
             <article class="feature-card">
                 <p class="section-label">Location and reach</p>
+                <p><strong>Branch:</strong> <span id="profileName">-</span></p>
+                <p id="profileDescription">No branch loaded yet.</p>
                 <p><strong>Contact:</strong> <span id="profilePhone">-</span></p>
                 <p><strong>Service radius:</strong> <span id="profileRadius">-</span></p>
                 <p><strong>Status:</strong> <span id="profileStatus">-</span></p>

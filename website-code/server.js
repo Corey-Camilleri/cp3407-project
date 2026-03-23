@@ -54,6 +54,7 @@ app.get('/api/restaurants', async (req, res) => {
     res.json(
       restaurants.map((restaurant) => ({
         id: restaurant.Restaurant_ID,
+        merchantPersonId: restaurant.Merchant_Person_ID,
         name: restaurant.Name,
         description: restaurant.Description,
         phone: restaurant.Phone,
