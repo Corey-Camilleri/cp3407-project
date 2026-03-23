@@ -28,9 +28,31 @@ const avgOrderValue = document.getElementById('avgOrderValue');
 const activeMenuItems = document.getElementById('activeMenuItems');
 
 const params = new URLSearchParams(window.location.search);
-const operatorRole = String(params.get('role') || 'owner').toLowerCase() === 'admin' ? 'Admin' : 'Owner';
-const requestedAccountId = Number(params.get('accountId') || (operatorRole === 'Owner' ? 1 : 0));
-const ownerFallbackAccountId = Number(params.get('accountId') || 1);
+const sessionStorageKey = 'feedme_session';
+
+function loadSession() {
+  try {
+    const raw = sessionStorage.getItem(sessionStorageKey);
+    if (!raw) {
+      return null;
+    }
+
+    const parsed = JSON.parse(raw);
+    return parsed && typeof parsed === 'object' ? parsed : null;
+  } catch (error) {
+    return null;
+  }
+}
+
+const activeSession = loadSession();
+const sessionRole = String(activeSession && activeSession.role ? activeSession.role : '').toLowerCase();
+const isOwnerSession = sessionRole === 'owner';
+const isAdminSession = sessionRole === 'admin';
+const isAuthorizedOperator = isOwnerSession || isAdminSession;
+const roleSource = String(params.get('role') || (isAuthorizedOperator ? sessionRole : '')).toLowerCase();
+const operatorRole = roleSource === 'admin' ? 'Admin' : 'Owner';
+const requestedAccountId = Number(params.get('accountId') || (activeSession && activeSession.accountId) || (operatorRole === 'Owner' ? 1 : 0));
+const ownerFallbackAccountId = Number(params.get('accountId') || (activeSession && activeSession.accountId) || 1);
 
 let restaurants = [];
 let accounts = [];
@@ -258,6 +280,25 @@ function renderManagedRestaurantsSection() {
 }
 
 function renderAccountProfile() {
+  const personName = activeSession && activeSession.fullName ? activeSession.fullName : 'Guest user';
+  const personEmail = activeSession && activeSession.email ? activeSession.email : 'No session email';
+  const personRole = sessionRole
+    ? String(sessionRole).charAt(0).toUpperCase() + String(sessionRole).slice(1)
+    : '-';
+
+  if (!isAuthorizedOperator) {
+    accountName.textContent = personName;
+    accountSummary.textContent = `Profile only. ${personRole === '-' ? 'Please log in as an owner or admin to manage restaurants.' : `${personRole} accounts cannot manage restaurants.`}`;
+    accountRole.textContent = personRole;
+    accountRestaurantCount.textContent = '0';
+    accountBrandCount.textContent = '0';
+
+    if (adminTestButton) {
+      adminTestButton.hidden = true;
+    }
+    return;
+  }
+
   if (!activeAccount) {
     accountName.textContent = 'Account profile';
     accountSummary.textContent = 'No account loaded yet.';
@@ -268,12 +309,8 @@ function renderAccountProfile() {
   }
 
   const groupedBrands = groupByBrand(activeAccount.restaurants);
-  const accountLabel = operatorRole === 'Admin'
-    ? 'Admin (all accounts)'
-    : `${operatorRole} ${activeAccount.accountId}`;
-
-  accountName.textContent = accountLabel;
-  accountSummary.textContent = `${accountLabel} manages ${activeAccount.restaurants.length} restaurant branch${activeAccount.restaurants.length === 1 ? '' : 'es'} across ${groupedBrands.length} brand${groupedBrands.length === 1 ? '' : 's'}.`;
+  accountName.textContent = personName;
+  accountSummary.textContent = `${personRole} • ${personEmail}`;
   accountRole.textContent = operatorRole;
   accountRestaurantCount.textContent = String(activeAccount.restaurants.length);
   accountBrandCount.textContent = String(groupedBrands.length);
@@ -308,7 +345,7 @@ function bindManagedRestaurantActions() {
 }
 
 function bindAdminTestAction() {
-  if (!adminTestButton) {
+  if (!adminTestButton || !isAuthorizedOperator) {
     return;
   }
 
@@ -365,6 +402,10 @@ function selectActiveAccount(allAccounts) {
     };
   }
 
+  if (isOwnerSession && activeSession && Number(activeSession.accountId) > 0) {
+    return allAccounts.find((entry) => Number(entry.accountId) === Number(activeSession.accountId)) || null;
+  }
+
   const byRequest = requestedAccountId > 0
     ? allAccounts.find((entry) => Number(entry.accountId) === requestedAccountId)
     : null;
@@ -375,6 +416,16 @@ function selectActiveAccount(allAccounts) {
 async function loadRestaurants() {
   restaurantStatus.textContent = 'Loading restaurant list...';
   setDashboardVisible(false);
+
+  if (!isAuthorizedOperator) {
+    restaurantStatus.textContent = 'Restaurant home is available to owner/admin accounts only.';
+    restaurantMenuDisplay.innerHTML = '';
+    renderAccountProfile();
+    if (managedRestaurantsSections) {
+      managedRestaurantsSections.innerHTML = '';
+    }
+    return;
+  }
 
   try {
     const response = await fetch('/api/restaurants');

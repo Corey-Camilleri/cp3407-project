@@ -3,167 +3,210 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Add / Edit Restaurant Profile</title>
+  <title>FeedMe | Add / Edit Restaurant Profile</title>
   <link rel="stylesheet" href="style.css">
-  <style>
-    :root{
-      --bg:#f6f8fb; --card:#ffffff; --muted:#6b7280; --accent:#0b74de; --success:#16a34a; --danger:#dc2626;
-      --radius:10px; --gap:14px; --maxw:920px;
-      --shadow: 0 6px 18px rgba(18,24,40,0.06);
-    }
-    html,body{height:100%;margin:0;font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial; background:var(--bg); color:#0f172a}
-    .container{max-width:var(--maxw);margin:28px auto;padding:20px}
-    .card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:22px}
-    h1{margin-top:0;font-size:1.5rem}
-
-    form{display:block}
-    .form-grid{display:grid;grid-template-columns:1fr;gap:var(--gap)}
-    .form-row{margin-bottom:4px}
-    label{display:block;font-weight:600;margin-bottom:6px;color:#0f172a}
-    input[type=text], input[type=email], textarea{width:100%;padding:10px;border:1px solid #e6eef8;border-radius:8px;background:#fbfdff;box-sizing:border-box}
-    textarea{resize:vertical}
-
-    .row-2{display:grid;grid-template-columns:1fr 1fr;gap:var(--gap)}
-    .actions{display:flex;gap:10px;margin-top:18px}
-    button{background:var(--accent);color:white;padding:10px 14px;border-radius:8px;border:0;cursor:pointer;font-weight:600}
-    button[type="button"]{background:#e6eef8;color:#0b74de}
-    button[disabled]{opacity:0.6;cursor:not-allowed}
-
-    .result{margin-top:12px}
-    .status{margin-top:12px;font-weight:700}
-    .badge{display:inline-block;padding:6px 10px;border-radius:999px;font-weight:700;background:#eef2ff;color:#1e3a8a}
-    .admin-note{font-size:0.9rem;color:var(--muted);margin-top:6px}
-
-    h2{margin:18px 0 8px}
-    #profilesList{list-style:none;padding:0;margin:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px}
-    #profilesList li{background:linear-gradient(180deg,#fff,#fbfdff);padding:12px;border-radius:8px;border:1px solid #eef2ff;box-shadow:0 3px 10px rgba(11,20,50,0.02)}
-    #profilesList a{color:var(--accent);text-decoration:none;font-weight:600}
-
-    @media(min-width:720px){ .form-grid{grid-template-columns:1fr 1fr} .form-grid .full{grid-column:1/-1} }
-  </style>
 </head>
 <body>
-  <main class="container">
-    <h1>Add / Edit Restaurant Profile</h1>
+  <main class="page-shell">
+    <header class="topbar">
+      <div>
+        <p class="brand-mark">FeedMe</p>
+        <p class="brand-subtitle">Create or update a restaurant profile for owner/admin review flow.</p>
+      </div>
+      <nav class="topnav" aria-label="Profile navigation">
+        <a href="index.html">Customer home</a>
+        <a href="restaurant-home.html">Restaurant home</a>
+        <a href="login.html" data-login-link>Login</a>
+        <button class="logout-nav-button" type="button" data-logout-button>Logout</button>
+      </nav>
+    </header>
 
-    <form id="profileForm" novalidate>
-      <div class="form-row">
-        <label for="name">Business name *</label>
-        <input id="name" name="name" type="text" required />
+    <section class="hero">
+      <p class="eyebrow">Restaurant profile</p>
+      <h1>Add / Edit Profile</h1>
+      <p class="hero-copy" id="profileSessionText">Use this form to save a restaurant profile draft locally.</p>
+    </section>
+
+    <section class="list-panel">
+      <div class="panel-header">
+        <div>
+          <p class="section-label">Profile details</p>
+          <h2>Business information</h2>
+          <p class="panel-copy">All fields save into local storage for demo workflows.</p>
+        </div>
       </div>
 
-      <div class="form-row">
-        <label for="abn">ABN / Business ID</label>
-        <input id="abn" name="abn" type="text" />
-      </div>
+      <form id="profileForm" class="menu-editor-form" novalidate>
+        <div class="profile-form-grid">
+          <label for="name">Business name *
+            <input id="name" name="name" type="text" required />
+          </label>
 
-      <div class="form-row">
-        <label for="address">Address *</label>
-        <input id="address" name="address" type="text" required />
-      </div>
+          <label for="abn">ABN / Business ID
+            <input id="abn" name="abn" type="text" />
+          </label>
 
-      <div class="form-row">
-        <label for="email">Contact email *</label>
-        <input id="email" name="email" type="email" required />
-      </div>
+          <label for="address" class="full">Address *
+            <input id="address" name="address" type="text" required />
+          </label>
 
-      <div class="form-row">
-        <label for="phone">Contact phone</label>
-        <input id="phone" name="phone" type="text" />
-      </div>
+          <label for="email">Contact email *
+            <input id="email" name="email" type="email" required />
+          </label>
 
-      <div class="form-row">
-        <label for="description">Short description</label>
-        <textarea id="description" name="description" rows="4"></textarea>
-      </div>
+          <label for="phone">Contact phone
+            <input id="phone" name="phone" type="text" />
+          </label>
 
-      <div class="form-row">
-        <label for="notes">Admin notes (internal)</label>
-        <textarea id="notes" name="notes" rows="2"></textarea>
-      </div>
+          <label for="description" class="full">Short description
+            <textarea id="description" name="description" rows="4"></textarea>
+          </label>
 
-      <div class="actions">
-        <button id="saveBtn" type="submit">Save profile</button>
-        <button id="cancelBtn" type="button">Cancel</button>
-      </div>
-    </form>
+          <label for="notes" class="full">Admin notes (internal)
+            <textarea id="notes" name="notes" rows="2"></textarea>
+          </label>
+        </div>
 
-    <div id="result"></div>
+        <div class="menu-editor-overlay-actions">
+          <button id="saveBtn" class="primary-link" type="submit">Save profile</button>
+          <button id="cancelBtn" class="refresh-button" type="button">Cancel</button>
+        </div>
+      </form>
 
-    <section id="statusSection" style="display:none">
-      <p class="status">Status: <span id="statusLabel"></span></p>
-      <p class="admin-note">Open this page with <code>?admin=1&id=[profileId]</code> to see approve/reject controls.</p>
-      <div id="adminControls" style="display:none">
-        <button id="approveBtn">Mark as Approved</button>
-        <button id="rejectBtn">Mark as Rejected</button>
+      <p id="result" class="status-message status-feedback"></p>
+    </section>
+
+    <section id="statusSection" class="feature-card profile-status-card" hidden>
+      <p class="section-label">Approval</p>
+      <p><strong>Status:</strong> <span id="statusLabel"></span></p>
+      <p class="profile-admin-note">Open with ?admin=1&id=[profileId] to access approve/reject actions.</p>
+      <div id="adminControls" class="menu-editor-overlay-actions" hidden>
+        <button id="approveBtn" class="primary-link" type="button">Mark as Approved</button>
+        <button id="rejectBtn" class="refresh-button" type="button">Mark as Rejected</button>
       </div>
     </section>
 
-    <hr />
-    <h2>Saved profiles (local)</h2>
-    <ul id="profilesList"></ul>
+    <section class="list-panel">
+      <div class="panel-header">
+        <div>
+          <p class="section-label">Local data</p>
+          <h2>Saved profiles</h2>
+        </div>
+      </div>
+      <ul id="profilesList" class="profiles-local-list"></ul>
+    </section>
   </main>
 
   <script>
-    // Utilities
-    function qs(sel){return document.querySelector(sel)}
-    function qsa(sel){return Array.from(document.querySelectorAll(sel))}
+    function qs(sel){ return document.querySelector(sel) }
     const STORAGE_KEY = 'restaurantProfiles'
+    const SESSION_KEY = 'feedme_session'
 
     function loadProfiles(){
-      try{ return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]') }catch(e){ return [] }
+      try {
+        return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]')
+      } catch (e) {
+        return []
+      }
     }
-    function saveProfiles(list){ localStorage.setItem(STORAGE_KEY, JSON.stringify(list)) }
 
-    function getParam(name){ const p=new URLSearchParams(window.location.search); return p.get(name) }
+    function saveProfiles(list){
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(list))
+    }
 
-    // Form handling
+    function getParam(name){
+      const p = new URLSearchParams(window.location.search)
+      return p.get(name)
+    }
+
+    function loadSession(){
+      try {
+        const raw = sessionStorage.getItem(SESSION_KEY)
+        if (!raw) {
+          return null
+        }
+        const parsed = JSON.parse(raw)
+        return parsed && typeof parsed === 'object' ? parsed : null
+      } catch (error) {
+        return null
+      }
+    }
+
+    function setResult(message, tone){
+      result.textContent = message
+      result.classList.remove('status-success', 'status-error', 'status-warning')
+      if (tone === 'success') {
+        result.classList.add('status-success')
+      } else if (tone === 'error') {
+        result.classList.add('status-error')
+      } else if (tone === 'warning') {
+        result.classList.add('status-warning')
+      }
+    }
+
     const form = qs('#profileForm')
     const result = qs('#result')
     const profilesList = qs('#profilesList')
     const statusSection = qs('#statusSection')
     const statusLabel = qs('#statusLabel')
     const adminControls = qs('#adminControls')
+    const profileSessionText = qs('#profileSessionText')
 
     function renderProfiles(){
       const list = loadProfiles()
       profilesList.innerHTML = ''
-      if(list.length===0){ profilesList.innerHTML = '<li>No saved profiles</li>'; return }
-      list.forEach(p=>{
+
+      if (list.length === 0) {
+        profilesList.innerHTML = '<li class="managed-branch-card"><h4>No saved profiles</h4><p>Create a profile to see it listed here.</p></li>'
+        return
+      }
+
+      list.forEach((profile) => {
         const li = document.createElement('li')
-        li.innerHTML = `<strong>${p.name}</strong> — ${p.address} — <em>${p.status}</em> -- <a href="?id=${p.id}">Edit</a>`
+        li.className = 'managed-branch-card'
+        li.innerHTML = `
+          <h4>${profile.name || 'Unnamed business'}</h4>
+          <p>${profile.address || 'No address'}</p>
+          <p>Status: ${profile.status || 'pending_review'}</p>
+          <a class="secondary-link" href="?id=${profile.id}">Edit profile</a>
+        `
         profilesList.appendChild(li)
       })
     }
 
     function validateForm(data){
       const errors = []
-      if(!data.name || data.name.trim().length<2) errors.push('Business name is required')
-      if(!data.address || data.address.trim().length<5) errors.push('Address is required')
-      if(!data.email || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(data.email)) errors.push('Valid contact email is required')
+      if (!data.name || data.name.trim().length < 2) errors.push('Business name is required.')
+      if (!data.address || data.address.trim().length < 5) errors.push('Address is required.')
+      if (!data.email || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(data.email)) errors.push('Valid contact email is required.')
       return errors
     }
 
     function loadForEdit(id){
       const list = loadProfiles()
-      const p = list.find(x=>String(x.id)===String(id))
-      if(!p) return
-      qs('#name').value = p.name || ''
-      qs('#abn').value = p.abn || ''
-      qs('#address').value = p.address || ''
-      qs('#email').value = p.email || ''
-      qs('#phone').value = p.phone || ''
-      qs('#description').value = p.description || ''
-      qs('#notes').value = p.notes || ''
-      statusSection.style.display = 'block'
-      statusLabel.textContent = p.status || 'pending_review'
-      const isAdmin = getParam('admin') === '1'
-      adminControls.style.display = isAdmin ? 'block' : 'none'
-      return p
+      const profile = list.find((item) => String(item.id) === String(id))
+
+      if (!profile) {
+        return
+      }
+
+      qs('#name').value = profile.name || ''
+      qs('#abn').value = profile.abn || ''
+      qs('#address').value = profile.address || ''
+      qs('#email').value = profile.email || ''
+      qs('#phone').value = profile.phone || ''
+      qs('#description').value = profile.description || ''
+      qs('#notes').value = profile.notes || ''
+
+      statusSection.hidden = false
+      statusLabel.textContent = profile.status || 'pending_review'
+      adminControls.hidden = getParam('admin') !== '1'
+      return profile
     }
 
-    form.addEventListener('submit', function(e){
+    form.addEventListener('submit', (e) => {
       e.preventDefault()
+
       const data = {
         id: getParam('id') || Date.now(),
         name: qs('#name').value.trim(),
@@ -176,50 +219,86 @@
         savedAt: new Date().toISOString(),
         status: 'pending_review'
       }
+
       const errors = validateForm(data)
-      if(errors.length){ result.innerHTML = '<p style="color:darkred">' + errors.join('<br>') + '</p>'; return }
+      if (errors.length) {
+        setResult(errors.join(' '), 'error')
+        return
+      }
 
       const list = loadProfiles()
-      const existingIndex = list.findIndex(x=>String(x.id)===String(data.id))
-      if(existingIndex>=0){ list[existingIndex] = Object.assign(list[existingIndex], data) }
-      else { list.push(data) }
+      const existingIndex = list.findIndex((item) => String(item.id) === String(data.id))
+
+      if (existingIndex >= 0) {
+        list[existingIndex] = Object.assign(list[existingIndex], data)
+      } else {
+        list.push(data)
+      }
+
       saveProfiles(list)
-      result.innerHTML = '<p style="color:green">Profile saved (pending review)</p>'
       renderProfiles()
-      statusSection.style.display = 'block'
+      statusSection.hidden = false
       statusLabel.textContent = data.status
-      history.replaceState(null,'', '?id=' + data.id)
+      setResult('Profile saved (pending review).', 'success')
+      history.replaceState(null, '', '?id=' + data.id)
     })
 
-    qs('#cancelBtn').addEventListener('click', ()=>{ window.location.href = 'index.html' })
+    qs('#cancelBtn').addEventListener('click', () => {
+      window.location.href = 'restaurant-home.html'
+    })
 
-    // Admin controls
-    qs('#approveBtn').addEventListener('click', ()=>{
+    qs('#approveBtn').addEventListener('click', () => {
       const id = getParam('id')
-      const list = loadProfiles(); const p = list.find(x=>String(x.id)===String(id)); if(!p){ alert('Profile not found'); return }
-      p.status = 'approved'
+      const list = loadProfiles()
+      const profile = list.find((item) => String(item.id) === String(id))
+
+      if (!profile) {
+        setResult('Profile not found.', 'error')
+        return
+      }
+
+      profile.status = 'approved'
       saveProfiles(list)
-      statusLabel.textContent = p.status
-      result.innerHTML = '<p style="color:green">Profile marked approved</p>'
+      statusLabel.textContent = profile.status
+      setResult('Profile marked approved.', 'success')
       renderProfiles()
     })
-    qs('#rejectBtn').addEventListener('click', ()=>{
+
+    qs('#rejectBtn').addEventListener('click', () => {
       const id = getParam('id')
-      const list = loadProfiles(); const p = list.find(x=>String(x.id)===String(id)); if(!p){ alert('Profile not found'); return }
-      p.status = 'rejected'
+      const list = loadProfiles()
+      const profile = list.find((item) => String(item.id) === String(id))
+
+      if (!profile) {
+        setResult('Profile not found.', 'error')
+        return
+      }
+
+      profile.status = 'rejected'
       saveProfiles(list)
-      statusLabel.textContent = p.status
-      result.innerHTML = '<p style="color:orange">Profile marked rejected</p>'
+      statusLabel.textContent = profile.status
+      setResult('Profile marked rejected.', 'warning')
       renderProfiles()
     })
 
-    // Init
     (function init(){
+      const session = loadSession()
+      if (!session) {
+        profileSessionText.textContent = 'Not signed in. You can still draft a profile locally for demo use.'
+      } else {
+        const role = String(session.role || 'user')
+        const roleLabel = role.charAt(0).toUpperCase() + role.slice(1)
+        profileSessionText.textContent = `Signed in as ${session.fullName || 'User'} (${roleLabel}).`
+      }
+
       renderProfiles()
       const id = getParam('id')
-      if(id) loadForEdit(id)
+      if (id) {
+        loadForEdit(id)
+      }
     })()
   </script>
+  <script src="features/logout.js"></script>
   <script src="features/cart-overlay.js"></script>
 </body>
 </html>
