@@ -7,6 +7,7 @@ const adminTestButton = document.getElementById('adminTestButton');
 const dashboardSection = document.getElementById('dashboard');
 const dashboardStatsSection = document.getElementById('dashboardStats');
 const dashboardBranchProfile = document.getElementById('dashboardBranchProfile');
+const openingHoursSection = document.getElementById('opening-hours');
 const menuDisplaySection = document.getElementById('menu-display');
 const dashboardRestaurantName = document.getElementById('dashboardRestaurantName');
 
@@ -116,32 +117,7 @@ function groupByBrand(items) {
 }
 
 function getMenuDisplayItems(restaurantId) {
-  return [
-    {
-      id: `${restaurantId}-item-1`,
-      name: 'House Special',
-      price: 14.9,
-      available: true
-    },
-    {
-      id: `${restaurantId}-item-2`,
-      name: 'Lunch Combo',
-      price: 18.5,
-      available: true
-    },
-    {
-      id: `${restaurantId}-item-3`,
-      name: 'Sides Pack',
-      price: 9.0,
-      available: false
-    },
-    {
-      id: `${restaurantId}-item-4`,
-      name: 'Chef Dessert',
-      price: 7.5,
-      available: true
-    }
-  ];
+  return [];
 }
 
 function computeStats(restaurantId, menuItemsCount) {
@@ -168,7 +144,7 @@ function renderBranchProfile(restaurant) {
 }
 
 function setDashboardVisible(visible) {
-  [dashboardSection, dashboardStatsSection, dashboardBranchProfile, menuDisplaySection].forEach((section) => {
+  [dashboardSection, dashboardStatsSection, dashboardBranchProfile, openingHoursSection, menuDisplaySection].forEach((section) => {
     if (section) {
       section.hidden = !visible;
     }
@@ -196,7 +172,7 @@ function renderMenuDisplay(restaurant) {
       <article class="menu-display-item">
         <div>
           <h3>${item.name}</h3>
-          <p class="description">Sample display item for ${getBranchDisplayName(restaurant)}.</p>
+          <p class="description">${getBranchDisplayName(restaurant)}</p>
         </div>
         <div class="menu-display-meta">
           <p><strong>${toCurrency(item.price)}</strong></p>

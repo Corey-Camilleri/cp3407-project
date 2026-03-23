@@ -21,16 +21,21 @@ document.addEventListener('DOMContentLoaded', () => {
     };
     const orderedDays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
-    if (!restaurantSelector || !openingHoursStatus || !openingHoursList || !openingHoursOverlay || !openingHoursBackdrop || !openingHoursEditorList || !openingHoursSaveButton || !openingHoursCancelButton) {
+    if (!openingHoursStatus || !openingHoursList || !openingHoursOverlay || !openingHoursBackdrop || !openingHoursEditorList || !openingHoursSaveButton || !openingHoursCancelButton) {
         return;
     }
 
     let editorHours = [];
     let baselineEditorHours = [];
     let selectedDayIndex = -1;
+    let selectedRestaurantId = '';
 
     function getRestaurantId() {
-        return restaurantSelector.value ? String(restaurantSelector.value) : '';
+        if (restaurantSelector && restaurantSelector.value) {
+            return String(restaurantSelector.value);
+        }
+
+        return selectedRestaurantId ? String(selectedRestaurantId) : '';
     }
 
     async function readHours(restaurantId) {
@@ -213,7 +218,7 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        openingHoursStatus.textContent = 'Availability hours for selected restaurant.';
+        openingHoursStatus.textContent = 'Available opening hours for selected restaurant.';
 
         if (!groupedHours.length) {
             openingHoursList.innerHTML = '<p class="status-message">No opening hours set.</p>';
@@ -399,11 +404,17 @@ document.addEventListener('DOMContentLoaded', () => {
         await renderEditorHours();
     });
 
-    restaurantSelector.addEventListener('change', async () => {
-        await renderAllHours();
-    });
+    if (restaurantSelector) {
+        restaurantSelector.addEventListener('change', async () => {
+            selectedRestaurantId = restaurantSelector.value ? String(restaurantSelector.value) : '';
+            await renderAllHours();
+        });
+    }
 
-    document.addEventListener('restaurant:selected', async () => {
+    document.addEventListener('restaurant:selected', async (event) => {
+        selectedRestaurantId = event && event.detail && event.detail.restaurantId
+            ? String(event.detail.restaurantId)
+            : '';
         await renderAllHours();
     });
 
