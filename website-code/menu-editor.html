@@ -78,7 +78,7 @@
     <section id="discountOverlay" class="menu-editor-overlay" hidden>
         <div class="menu-editor-overlay-card menu-editor-overlay-card-large">
             <div class="menu-editor-overlay-header">
-                <h2 id="discountBuilderHeading">Discount</h2>
+                <h2>Discount</h2>
                 <button type="button" class="menu-editor-close" data-close-overlay="discountOverlay">✕</button>
             </div>
 
@@ -106,17 +106,8 @@
                     </label>
                 </div>
 
-                <div id="discountBundleGroup" class="discount-config-group" hidden>
-                    <p class="section-label">Bundle items</p>
-                    <div id="discountBundleItems" class="discount-item-checklist"></div>
-                </div>
-
                 <div id="discountPercentGroup" class="discount-config-group">
                     <label>Discount percent (%)<input id="discountPercent" type="number" min="0" max="100" step="0.01"></label>
-                </div>
-
-                <div id="discountBundlePriceGroup" class="discount-config-group" hidden>
-                    <label>Bundle price ($)<input id="discountBundlePrice" type="number" min="0" step="0.01"></label>
                 </div>
 
                 <button class="primary-link" type="submit">Save discount</button>
@@ -125,6 +116,35 @@
             <div>
                 <p class="section-label">Saved</p>
                 <div id="discountList" class="menu-display-list"></div>
+            </div>
+        </div>
+    </section>
+
+    <section id="bundleOverlay" class="menu-editor-overlay" hidden>
+        <div class="menu-editor-overlay-card menu-editor-overlay-card-large">
+            <div class="menu-editor-overlay-header">
+                <h2>Bundle</h2>
+                <button type="button" class="menu-editor-close" data-close-overlay="bundleOverlay">✕</button>
+            </div>
+
+            <form id="bundleForm" class="menu-editor-form">
+                <label>Bundle name<input id="bundleName" type="text" required></label>
+
+                <div class="discount-config-group">
+                    <p class="section-label">Bundle items</p>
+                    <div id="bundleItems" class="discount-item-checklist"></div>
+                </div>
+
+                <div class="discount-config-group">
+                    <label>Bundle price ($)<input id="bundlePrice" type="number" min="0" step="0.01" required></label>
+                </div>
+
+                <button class="primary-link" type="submit">Save bundle</button>
+            </form>
+
+            <div>
+                <p class="section-label">Saved</p>
+                <div id="bundleList" class="menu-display-list"></div>
             </div>
         </div>
     </section>

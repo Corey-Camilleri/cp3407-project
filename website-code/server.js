@@ -6,7 +6,9 @@ require('dotenv').config();
 
 const app = express();
 app.use(express.json());
-app.use(express.static(path.join(__dirname)));
+const staticDirectory = path.join(__dirname);
+app.use(express.static(staticDirectory));
+app.use('/website-code', express.static(staticDirectory));
 
 // Database connection
 const sequelize = new Sequelize(
@@ -98,8 +100,8 @@ app.get('/api/menu-items', async (req, res) => {
   }
 });
 
-// Serve your index.html
-app.get('/', (req, res) => {
+// Serve homepage for both local root and GitHub Pages-like path
+app.get(['/', '/website-code', '/website-code/'], (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));
 });
 

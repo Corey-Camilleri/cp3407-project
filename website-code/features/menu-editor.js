@@ -12,10 +12,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const addItemOverlay = document.getElementById('addItemOverlay');
     const itemDetailsOverlay = document.getElementById('itemDetailsOverlay');
     const discountOverlay = document.getElementById('discountOverlay');
+    const bundleOverlay = document.getElementById('bundleOverlay');
     const editorBackdrop = document.getElementById('editorBackdrop');
     const addItemForm = document.getElementById('addItemForm');
     const itemDetailsForm = document.getElementById('itemDetailsForm');
     const discountForm = document.getElementById('discountForm');
+    const bundleForm = document.getElementById('bundleForm');
     const removeItemButton = document.getElementById('removeItemButton');
     const saveItemButton = document.getElementById('saveItemButton');
     const itemOverlayHeading = document.getElementById('itemOverlayHeading');
@@ -36,18 +38,17 @@ document.addEventListener('DOMContentLoaded', () => {
     const discountTypeSelect = document.getElementById('discountType');
     const discountItemSelect = document.getElementById('discountItem');
     const discountCategorySelect = document.getElementById('discountCategory');
-    const discountBundleItems = document.getElementById('discountBundleItems');
     const discountPercentInput = document.getElementById('discountPercent');
-    const discountBundlePriceInput = document.getElementById('discountBundlePrice');
+    const bundleNameInput = document.getElementById('bundleName');
+    const bundleItems = document.getElementById('bundleItems');
+    const bundlePriceInput = document.getElementById('bundlePrice');
     const discountList = document.getElementById('discountList');
-    const discountBuilderHeading = document.getElementById('discountBuilderHeading');
+    const bundleList = document.getElementById('bundleList');
 
     const discountTypeGroup = document.getElementById('discountTypeGroup');
     const discountItemGroup = document.getElementById('discountItemGroup');
     const discountCategoryGroup = document.getElementById('discountCategoryGroup');
-    const discountBundleGroup = document.getElementById('discountBundleGroup');
     const discountPercentGroup = document.getElementById('discountPercentGroup');
-    const discountBundlePriceGroup = document.getElementById('discountBundlePriceGroup');
 
     const restaurantId = new URLSearchParams(window.location.search).get('restaurantId');
 
@@ -72,7 +73,6 @@ document.addEventListener('DOMContentLoaded', () => {
     let discounts = [];
     let editMode = false;
     let selectedItemId = null;
-    let discountOverlayMode = 'discount';
 
     function getStorageKey() {
         return `menuEditorItems:${restaurantId || 'missing-restaurant'}`;
@@ -106,7 +106,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         overlay.hidden = true;
-        const stillOpen = [addItemOverlay, itemDetailsOverlay, discountOverlay].some((entry) => entry && !entry.hidden);
+        const stillOpen = [addItemOverlay, itemDetailsOverlay, discountOverlay, bundleOverlay].some((entry) => entry && !entry.hidden);
         if (!stillOpen && editorBackdrop) {
             editorBackdrop.hidden = true;
         }
@@ -116,6 +116,7 @@ document.addEventListener('DOMContentLoaded', () => {
         closeOverlay(addItemOverlay);
         closeOverlay(itemDetailsOverlay);
         closeOverlay(discountOverlay);
+        closeOverlay(bundleOverlay);
     }
 
     function setItemDetailsEditable(enabled) {
@@ -207,7 +208,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function populateDiscountSelectors() {
-        if (!discountItemSelect || !discountCategorySelect || !discountBundleItems) {
+        if (!discountItemSelect || !discountCategorySelect) {
             return;
         }
 
@@ -219,8 +220,14 @@ document.addEventListener('DOMContentLoaded', () => {
         discountCategorySelect.innerHTML = categories.length
             ? categories.map((category) => `<option value="${category}">${category}</option>`).join('')
             : '<option value="">No categories available</option>';
+    }
 
-        discountBundleItems.innerHTML = menuItems
+    function populateBundleItems() {
+        if (!bundleItems) {
+            return;
+        }
+
+        bundleItems.innerHTML = menuItems
             .map((item) => `
                 <label class="discount-check-row">
                     <input type="checkbox" name="bundleItem" value="${item.id}">
@@ -235,10 +242,10 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        const type = discountOverlayMode === 'bundle' ? 'bundle' : discountTypeSelect.value;
+        const type = discountTypeSelect.value;
 
         if (discountTypeGroup) {
-            discountTypeGroup.hidden = discountOverlayMode === 'bundle';
+            discountTypeGroup.hidden = false;
         }
 
         if (discountItemGroup) {
@@ -249,38 +256,9 @@ document.addEventListener('DOMContentLoaded', () => {
             discountCategoryGroup.hidden = type !== 'category';
         }
 
-        if (discountBundleGroup) {
-            discountBundleGroup.hidden = type !== 'bundle';
-        }
-
         if (discountPercentGroup) {
-            discountPercentGroup.hidden = type === 'bundle';
+            discountPercentGroup.hidden = false;
         }
-
-        if (discountBundlePriceGroup) {
-            discountBundlePriceGroup.hidden = type !== 'bundle';
-        }
-
-        if (discountBuilderHeading) {
-            discountBuilderHeading.textContent = discountOverlayMode === 'bundle' ? 'Bundle' : 'Discount';
-        }
-    }
-
-    function openDiscountBuilder(mode) {
-        discountOverlayMode = mode === 'bundle' ? 'bundle' : 'discount';
-
-        if (discountTypeSelect) {
-            if (discountOverlayMode === 'bundle') {
-                discountTypeSelect.value = 'bundle';
-            } else if (discountTypeSelect.value === 'bundle') {
-                discountTypeSelect.value = 'item';
-            }
-        }
-
-        populateDiscountSelectors();
-        updateDiscountTypeUI();
-        renderDiscountList();
-        openOverlay(discountOverlay);
     }
 
     function renderDiscountList() {
@@ -288,12 +266,14 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        if (!discounts.length) {
+        const savedDiscounts = discounts.filter((discount) => discount.type === 'item' || discount.type === 'category');
+
+        if (!savedDiscounts.length) {
             discountList.innerHTML = '<p class="status-message">No discounts configured yet.</p>';
             return;
         }
 
-        discountList.innerHTML = discounts
+        discountList.innerHTML = savedDiscounts
             .map((discount) => {
                 let scopeLabel = '';
 
@@ -301,14 +281,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     scopeLabel = `Item: ${getItemNameById(discount.itemId)}`;
                 } else if (discount.type === 'category') {
                     scopeLabel = `Category: ${discount.category || 'Unspecified'}`;
-                } else {
-                    const names = (discount.bundleItemIds || []).map((itemId) => getItemNameById(itemId));
-                    scopeLabel = `Bundle: ${names.join(', ')}`;
                 }
 
-                const ruleLabel = discount.type === 'bundle'
-                    ? `Bundle price: $${formatPrice(discount.bundlePrice)}`
-                    : `Discount: ${formatPrice(discount.percent)}%`;
+                const ruleLabel = `Discount: ${formatPrice(discount.percent)}%`;
 
                 return `
                     <article class="menu-display-item">
@@ -319,6 +294,38 @@ document.addEventListener('DOMContentLoaded', () => {
                         </div>
                         <div class="menu-display-meta">
                             <button class="menu-remove-submit" type="button" data-remove-discount-id="${discount.id}">Remove</button>
+                        </div>
+                    </article>
+                `;
+            })
+            .join('');
+    }
+
+    function renderBundleList() {
+        if (!bundleList) {
+            return;
+        }
+
+        const savedBundles = discounts.filter((discount) => discount.type === 'bundle');
+
+        if (!savedBundles.length) {
+            bundleList.innerHTML = '<p class="status-message">No bundles configured yet.</p>';
+            return;
+        }
+
+        bundleList.innerHTML = savedBundles
+            .map((bundle) => {
+                const names = (bundle.bundleItemIds || []).map((itemId) => getItemNameById(itemId));
+
+                return `
+                    <article class="menu-display-item">
+                        <div>
+                            <h3>${bundle.name}</h3>
+                            <p>Bundle: ${names.join(', ')}</p>
+                            <p>Bundle price: $${formatPrice(bundle.bundlePrice)}</p>
+                        </div>
+                        <div class="menu-display-meta">
+                            <button class="menu-remove-submit" type="button" data-remove-discount-id="${bundle.id}">Remove</button>
                         </div>
                     </article>
                 `;
@@ -575,13 +582,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (openDiscountOverlayButton) {
         openDiscountOverlayButton.addEventListener('click', () => {
-            openDiscountBuilder('discount');
+            populateDiscountSelectors();
+            updateDiscountTypeUI();
+            renderDiscountList();
+            openOverlay(discountOverlay);
         });
     }
 
     if (openBundleOverlayButton) {
         openBundleOverlayButton.addEventListener('click', () => {
-            openDiscountBuilder('bundle');
+            populateBundleItems();
+            renderBundleList();
+            openOverlay(bundleOverlay);
         });
     }
 
@@ -591,7 +603,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    [addItemOverlay, itemDetailsOverlay, discountOverlay].forEach((overlay) => {
+    [addItemOverlay, itemDetailsOverlay, discountOverlay, bundleOverlay].forEach((overlay) => {
         if (!overlay) {
             return;
         }
@@ -706,11 +718,8 @@ document.addEventListener('DOMContentLoaded', () => {
             event.preventDefault();
 
             const name = discountNameInput ? discountNameInput.value.trim() : '';
-            const type = discountOverlayMode === 'bundle'
-                ? 'bundle'
-                : (discountTypeSelect ? discountTypeSelect.value : 'item');
+            const type = discountTypeSelect ? discountTypeSelect.value : 'item';
             const percent = Number(discountPercentInput ? discountPercentInput.value : 0);
-            const bundlePrice = Number(discountBundlePriceInput ? discountBundlePriceInput.value : 0);
 
             if (!name) {
                 return;
@@ -738,16 +747,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 discountRecord.category = category;
                 discountRecord.percent = percent;
-            } else {
-                const bundleItemIds = Array.from(discountBundleItems?.querySelectorAll('input[name="bundleItem"]:checked') || [])
-                    .map((input) => Number(input.value));
-
-                if (bundleItemIds.length < 2 || !Number.isFinite(bundlePrice) || bundlePrice <= 0) {
-                    return;
-                }
-
-                discountRecord.bundleItemIds = bundleItemIds;
-                discountRecord.bundlePrice = bundlePrice;
             }
 
             discounts.push(discountRecord);
@@ -756,6 +755,34 @@ document.addEventListener('DOMContentLoaded', () => {
             discountForm.reset();
             updateDiscountTypeUI();
             setEditorStatus('Discount saved.');
+        });
+    }
+
+    if (bundleForm) {
+        bundleForm.addEventListener('submit', (event) => {
+            event.preventDefault();
+
+            const name = bundleNameInput ? bundleNameInput.value.trim() : '';
+            const bundlePrice = Number(bundlePriceInput ? bundlePriceInput.value : 0);
+            const bundleItemIds = Array.from(bundleItems?.querySelectorAll('input[name="bundleItem"]:checked') || [])
+                .map((input) => Number(input.value));
+
+            if (!name || bundleItemIds.length < 2 || !Number.isFinite(bundlePrice) || bundlePrice <= 0) {
+                return;
+            }
+
+            discounts.push({
+                id: Date.now(),
+                name,
+                type: 'bundle',
+                bundleItemIds,
+                bundlePrice
+            });
+
+            saveDiscountsToStorage();
+            renderBundleList();
+            bundleForm.reset();
+            setEditorStatus('Bundle saved.');
         });
     }
 
@@ -773,6 +800,26 @@ document.addEventListener('DOMContentLoaded', () => {
 
             discounts = discounts.filter((discount) => String(discount.id) !== removeId);
             saveDiscountsToStorage();
+            renderDiscountList();
+            renderBundleList();
+        });
+    }
+
+    if (bundleList) {
+        bundleList.addEventListener('click', (event) => {
+            const target = event.target;
+            if (!(target instanceof HTMLElement)) {
+                return;
+            }
+
+            const removeId = target.getAttribute('data-remove-discount-id');
+            if (!removeId) {
+                return;
+            }
+
+            discounts = discounts.filter((discount) => String(discount.id) !== removeId);
+            saveDiscountsToStorage();
+            renderBundleList();
             renderDiscountList();
         });
     }
